@@ -49,7 +49,7 @@ export default function Home() {
       {/* --- STANDART MENÜ --- */}
       <nav className="relative z-10 w-full px-8 py-6 max-w-7xl mx-auto flex flex-row justify-between items-center">
         <Link to="/" className="text-3xl tracking-tight text-white select-none" style={displayFont}>
-          HeyAlls<sup className="text-xs font-sans ml-0.5">®</sup>
+          HeyAlls Agency<sup className="text-xs font-sans ml-0.5">®</sup>
         </Link>
 
         <div className="hidden md:flex flex-row items-center gap-8">
