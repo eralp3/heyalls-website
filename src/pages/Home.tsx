@@ -1,10 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react'
 import emailjs from '@emailjs/browser'
-import Navbar from '@/components/Navbar'
-import VideoBackground from '@/components/VideoBackground'
-import { displayFont } from '@/utils/styles'
-// (Eğer varsa) import { BG_VIDEO_URL } from '@/utils/styles'
-import { updateSEO } from '@/utils/seo'
+import Navbar from '@/components/Navbar' // Düzeltildi
+import VideoBackground from '@/components/VideoBackground' // Düzeltildi
+import { displayFont } from '@/utils/styles' // Düzeltildi: styles
+import { updateSEO } from '@/utils/seo' // Düzeltildi: @/utils/seo
 
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID as string
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID as string

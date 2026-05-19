@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { displayFont } from '@/utils/styles'
-// (Eğer varsa) import { BG_VIDEO_URL } from '@/utils/styles'
+import { displayFont } from '@/utils/styles' // Düzeltildi: @/utils/styles
 
 interface NavbarProps {
   activePage?: 'home' | 'services' | 'process' | 'portfolio'

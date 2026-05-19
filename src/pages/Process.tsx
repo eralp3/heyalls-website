@@ -1,9 +1,8 @@
-import { useEffect } from 'react'
-import Navbar from '@/components/Navbar'
-import VideoBackground from '@/components/VideoBackground'
-import { displayFont } from '@/utils/styles'
-// (Eğer varsa) import { BG_VIDEO_URL } from '@/utils/styles'
-import { updateSEO } from '@/utils/seo'
+import { useEffect } from 'react';
+import Navbar from '@/components/Navbar';
+import VideoBackground from '@/components/VideoBackground';
+import { displayFont } from '@/utils/styles'; // Düzeltildi: constants -> styles
+import { updateSEO } from '@/utils/seo';
 
 export default function Process() {
   useEffect(() => {
@@ -11,8 +10,8 @@ export default function Process() {
       title: 'Nasıl Çalışır? | Sürecimiz',
       description:
         'İhtiyacınızı analiz ediyor, en doğru onaylı çözüm ortağı ile eşleştiriyor ve tüm süreci yönetiyoruz.',
-    })
-  }, [])
+    });
+  }, []);
 
   return (
     <div className="relative min-h-screen w-full bg-[#001a2c] text-white selection:bg-white/20">

@@ -1,18 +1,19 @@
 import { useEffect } from 'react';
-// Eski tahmini yol yerine bunu yazın:
+import { Link } from 'react-router-dom';
 import { updateSEO } from '@/utils/seo';
-useEffect(() => {
-  updateSEO({
-    title: 'Hizmetlerimiz ve Çözümlerimiz',
-    description: 'Yazılımdan dijital pazarlamaya, tasarım danışmanlığından kurumsal çözümlere kadar HeyAlls onaylı ortaklarının sunduğu elit hizmetler.'
-  });
-}, []);
-import { Link } from 'react-router-dom'
-import Navbar from '../components/Navbar'
-import VideoBackground from '../components/VideoBackground'
-import { displayFont } from '../utils/styles'
+import { displayFont } from '@/utils/styles'; // Artık @ alias kullanıyoruz
+import Navbar from '@/components/Navbar';
+import VideoBackground from '@/components/VideoBackground';
 
 export default function Services() {
+  // useEffect artık fonksiyonun içinde ve doğru konumda
+  useEffect(() => {
+    updateSEO({
+      title: 'Hizmetlerimiz ve Çözümlerimiz',
+      description: 'Yazılımdan dijital pazarlamaya, tasarım danışmanlığından kurumsal çözümlere kadar HeyAlls onaylı ortaklarının sunduğu elit hizmetler.'
+    });
+  }, []);
+
   return (
     <div className="relative min-h-screen w-full bg-[#001a2c] text-white selection:bg-white/20">
       <VideoBackground overlayOpacity="dark" />
@@ -139,7 +140,6 @@ export default function Services() {
           Projelerinizi sadece dinlemiyor, doğru uzman ağıyla hayata geçiriyoruz.
         </p>
         
-        {/* Yumuşak geçiş sağlayan SPA yönlendirmesi */}
         <Link
           to="/#intake"
           className="liquid-glass rounded-full px-12 py-4 text-base text-white transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer inline-block border border-white/20 hover:border-white/50"
