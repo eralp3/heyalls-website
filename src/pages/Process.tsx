@@ -1,7 +1,8 @@
 import { useEffect } from 'react'
 import Navbar from '@/components/Navbar'
 import VideoBackground from '@/components/VideoBackground'
-import { displayFont } from '@/utils/constants'
+import { displayFont } from '@/utils/styles'
+// (Eğer varsa) import { BG_VIDEO_URL } from '@/utils/styles'
 import { updateSEO } from '@/utils/seo'
 
 export default function Process() {

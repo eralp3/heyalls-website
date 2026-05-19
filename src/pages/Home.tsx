@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react'
 import emailjs from '@emailjs/browser'
 import Navbar from '@/components/Navbar'
 import VideoBackground from '@/components/VideoBackground'
-import { displayFont } from '@/utils/constants'
+import { displayFont } from '@/utils/styles'
+// (Eğer varsa) import { BG_VIDEO_URL } from '@/utils/styles'
 import { updateSEO } from '@/utils/seo'
 
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID as string
