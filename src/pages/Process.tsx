@@ -1,3 +1,11 @@
+import { useEffect } from 'react';
+import { updateSEO } from '../utils/seo';
+useEffect(() => {
+  updateSEO({
+    title: 'Nasıl Çalışır? | Sürecimiz',
+    description: 'İhtiyacınızı analiz ediyor, en doğru onaylı çözüm ortağı ile eşleştiriyor ve tüm süreci HeyAlls güvencesiyle şeffafça yönetiyoruz.'
+  });
+}, []);
 import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import VideoBackground from '../components/VideoBackground'

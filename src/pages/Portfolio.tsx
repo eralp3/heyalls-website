@@ -1,4 +1,11 @@
-
+import { useEffect } from 'react';
+import { updateSEO } from '../utils/seo';
+useEffect(() => {
+  updateSEO({
+    title: 'Başarı Hikayeleri | Portfolyo',
+    description: 'HeyAlls ekosistemindeki seçkin uzmanların ve markaların hayata geçirdiği nitelikli projeleri, vaka çalışmalarını inceleyin.'
+  });
+}, []);
 import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import VideoBackground from '../components/VideoBackground'

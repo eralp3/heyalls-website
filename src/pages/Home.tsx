@@ -1,3 +1,11 @@
+import { useEffect } from 'react';
+import { updateSEO } from '../utils/seo';
+useEffect(() => {
+  updateSEO({
+    title: 'Onaylı Çözüm Ortaklığı Ağı',
+    description: 'HeyAlls – Güvenilir hizmet sağlayıcıları, şeffaf komisyon modeli ve %100 güven temelli pazar yeri altyapısıyla tek çatı altında.'
+  });
+}, []);
 import React, { useState, useRef } from 'react'
 import emailjs from '@emailjs/browser'
 import Navbar from '../components/Navbar'

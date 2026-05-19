@@ -1,3 +1,11 @@
+import { useEffect } from 'react';
+import { updateSEO } from '../utils/seo';
+useEffect(() => {
+  updateSEO({
+    title: 'Hizmetlerimiz ve Çözümlerimiz',
+    description: 'Yazılımdan dijital pazarlamaya, tasarım danışmanlığından kurumsal çözümlere kadar HeyAlls onaylı ortaklarının sunduğu elit hizmetler.'
+  });
+}, []);
 import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import VideoBackground from '../components/VideoBackground'
