@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { updateSEO } from '../utils/seo';
+// Eski tahmini yol yerine bunu yazın:
+import { updateSEO } from '@/utils/seo';
 useEffect(() => {
   updateSEO({
     title: 'Hizmetlerimiz ve Çözümlerimiz',

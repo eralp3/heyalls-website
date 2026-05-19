@@ -1,16 +1,9 @@
-import { useEffect } from 'react';
-import { updateSEO } from '../utils/seo';
-useEffect(() => {
-  updateSEO({
-    title: 'Onaylı Çözüm Ortaklığı Ağı',
-    description: 'HeyAlls – Güvenilir hizmet sağlayıcıları, şeffaf komisyon modeli ve %100 güven temelli pazar yeri altyapısıyla tek çatı altında.'
-  });
-}, []);
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import emailjs from '@emailjs/browser'
-import Navbar from '../components/Navbar'
-import VideoBackground from '../components/VideoBackground'
-import { displayFont } from '../utils/styles'
+import Navbar from '@/components/Navbar'
+import VideoBackground from '@/components/VideoBackground'
+import { displayFont } from '@/utils/constants'
+import { updateSEO } from '@/utils/seo'
 
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID as string
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID as string
@@ -23,6 +16,14 @@ const services = [
 ]
 
 export default function Home() {
+  useEffect(() => {
+    updateSEO({
+      title: 'Onaylı Çözüm Ortaklığı Ağı',
+      description:
+        'HeyAlls – Güvenilir hizmet sağlayıcıları, şeffaf komisyon modeli ve %100 güven temelli pazar yeri altyapısıyla tek çatı altında.',
+    })
+  }, [])
+
   const [selectedService, setSelectedService] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
   const [isSending, setIsSending] = useState(false)
@@ -32,15 +33,8 @@ export default function Home() {
 
   const sendEmail = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-
-    if (!selectedService) {
-      setServiceError(true)
-      return
-    }
-
-    setServiceError(false)
-    setIsSending(true)
-    setIsError(false)
+    if (!selectedService) { setServiceError(true); return }
+    setServiceError(false); setIsSending(true); setIsError(false)
 
     emailjs
       .sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, formRef.current!, EMAILJS_PUBLIC_KEY)
@@ -51,25 +45,19 @@ export default function Home() {
         if (formRef.current) formRef.current.reset()
         setSelectedService(null)
       })
-      .catch((err) => {
-        console.error("EmailJS Hatası:", err)
+      .catch((err: unknown) => {
+        if (import.meta.env.DEV) console.error('EmailJS Hatası:', err)
         setIsError(true)
         setIsSending(false)
       })
   }
 
-  // Kullanıcı inputları değiştirdiğinde hataları otomatik temizleyen fonksiyon
-  const handleInputChange = () => {
-    if (isError) setIsError(false)
-  }
-
   return (
     <div className="relative min-h-screen w-full bg-[#001a2c] text-white selection:bg-white/20">
-      <VideoBackground overlayOpacity="light"/>
+      <VideoBackground overlayOpacity="light" />
+      <Navbar activePage="home" />
 
-      <Navbar activePage="home"/>
-
-      
+      {/* Hero */}
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-6 pt-20 md:pt-32 pb-32 md:pb-40">
         <div className="inline-block mb-6 px-5 py-2 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm text-xs md:text-sm text-white/80 animate-fade-rise">
           Güven Odaklı Çözüm Ortaklığı Ağı
@@ -84,20 +72,19 @@ export default function Home() {
         </h1>
         <p className="text-white/60 text-base sm:text-lg max-w-2xl mt-8 leading-relaxed font-body animate-fade-rise-delay">
           Sektörün en seçkin hizmet sağlayıcılarını, şeffaf komisyon modeli ve %100 güven temelli
-          pazar yeri altyapımızla tek bir çatı altında birleştiriyoruz. İhtiyacınız olan her çözüm,
-          denetlenmiş ağımızda mevcut.
+          pazar yeri altyapımızla tek bir çatı altında birleştiriyoruz.
         </p>
         <a
           href="#intake"
-          className="liquid-glass rounded-full px-12 md:px-14 py-4 md:py-5 text-base text-white mt-10 transition-transform duration-300 hover:scale-[1.03] active:scale-[0.98] inline-block text-center cursor-pointer animate-fade-rise-delay-2"
+          className="bg-white/10 backdrop-blur-md rounded-full px-12 md:px-14 py-4 md:py-5 text-base text-white mt-10 transition-transform duration-300 hover:scale-[1.03] active:scale-[0.98] inline-block text-center cursor-pointer border border-white/10 animate-fade-rise-delay-2"
         >
           Hemen Değerlendirin
         </a>
       </main>
 
-      
+      {/* İletişim / Intake Formu */}
       <section id="intake" className="relative z-10 max-w-4xl mx-auto px-6 md:px-8 py-20 md:py-32">
-        <div className="liquid-glass rounded-[2rem] p-6 md:p-14 border border-white/10 bg-white/5 backdrop-blur-lg shadow-2xl">
+        <div className="bg-white/5 backdrop-blur-lg rounded-[2rem] p-6 md:p-14 border border-white/10 shadow-2xl">
           <div className="text-center mb-10 md:mb-12">
             <span className="text-xs font-medium uppercase tracking-widest text-white/50 block mb-3 md:mb-4">
               Platforma Dahil Olun
@@ -110,19 +97,18 @@ export default function Home() {
             </h2>
             <p className="text-white/60 text-sm md:text-base max-w-lg mx-auto">
               HeyAlls ekosisteminde hangi rolde yer almak istediğinizi seçin. Uzman ekibimiz
-              detaylar için sizinle iletişime geçsin.
+              sizinle iletişime geçsin.
             </p>
           </div>
 
-          <form ref={formRef} onSubmit={sendEmail} onChange={handleInputChange} className="space-y-8">
-            
-            <input 
-              type="hidden" 
-              name="selected_service" 
-              value={services.find(s => s.id === selectedService)?.label ?? 'Belirtilmedi'} 
+          <form ref={formRef} onSubmit={sendEmail} onChange={() => setIsError(false)} className="space-y-8">
+            <input
+              type="hidden"
+              name="selected_service"
+              value={services.find((s) => s.id === selectedService)?.label ?? 'Belirtilmedi'}
             />
 
-            
+            {/* Hizmet Seçimi */}
             <div className="space-y-4">
               <label className="text-xs uppercase tracking-widest text-white/70">
                 Nasıl bir çözüm arıyorsunuz?
@@ -132,11 +118,7 @@ export default function Home() {
                   <button
                     key={service.id}
                     type="button"
-                    onClick={() => {
-                      setSelectedService(service.id)
-                      setServiceError(false)
-                      if (isError) setIsError(false)
-                    }}
+                    onClick={() => { setSelectedService(service.id); setServiceError(false) }}
                     className={`px-5 py-3 rounded-full text-sm transition-all duration-300 border text-left md:text-center ${
                       selectedService === service.id
                         ? 'bg-white text-black border-white shadow-lg scale-[1.01]'
@@ -154,7 +136,7 @@ export default function Home() {
               )}
             </div>
 
-            
+            {/* İsim & E-posta */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
               <div className="space-y-2">
                 <label className="text-xs uppercase tracking-widest text-white/70">
@@ -182,7 +164,7 @@ export default function Home() {
               </div>
             </div>
 
-            
+            {/* Mesaj */}
             <div className="space-y-2 pt-4">
               <label className="text-xs uppercase tracking-widest text-white/70">
                 Beklentileriniz veya Sunduğunuz Çözümler
@@ -196,27 +178,25 @@ export default function Home() {
               />
             </div>
 
-            
+            {/* Gönder */}
             <div className="pt-8 text-center flex flex-col items-center">
               <button
                 type="submit"
                 disabled={isSending}
-                className={`liquid-glass w-full md:w-auto rounded-full px-10 md:px-12 py-4 text-sm md:text-base text-white transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer font-medium tracking-wide border border-white/20 hover:border-white/50 ${
-                  isSending ? 'opacity-50 cursor-wait' : ''
+                className={`bg-white/10 backdrop-blur-md w-full md:w-auto rounded-full px-10 md:px-12 py-4 text-sm md:text-base text-white transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] font-medium border border-white/20 ${
+                  isSending ? 'opacity-50 cursor-wait' : 'cursor-pointer'
                 }`}
               >
                 {isSending ? 'Gönderiliyor...' : 'Talebi Gönder'}
               </button>
-              
               {isSuccess && (
                 <p className="text-green-400 mt-4 text-sm animate-fade-rise">
-                  Talebiniz başarıyla alındı. En kısa sürede ağ yöneticilerimiz dönüş yapacaktır.
+                  Talebiniz başarıyla alındı. Dönüş yapılacaktır.
                 </p>
               )}
-              
               {isError && (
                 <p className="text-red-400 mt-4 text-sm animate-fade-rise">
-                  Bir hata oluştu. Lütfen bağlantınızı kontrol edip tekrar deneyin.
+                  Bir hata oluştu. Lütfen tekrar deneyin.
                 </p>
               )}
             </div>
