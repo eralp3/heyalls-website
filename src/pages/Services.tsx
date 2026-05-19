@@ -1,156 +1,93 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { updateSEO } from '@/utils/seo';
-import { displayFont } from '@/utils/styles'; // Artık @ alias kullanıyoruz
 import Navbar from '@/components/Navbar';
 import VideoBackground from '@/components/VideoBackground';
+import { displayFont } from '@/utils/styles';
+import { updateSEO } from '@/utils/seo';
 
 export default function Services() {
-  // useEffect artık fonksiyonun içinde ve doğru konumda
   useEffect(() => {
     updateSEO({
-      title: 'Hizmetlerimiz ve Çözümlerimiz',
-      description: 'Yazılımdan dijital pazarlamaya, tasarım danışmanlığından kurumsal çözümlere kadar HeyAlls onaylı ortaklarının sunduğu elit hizmetler.'
+      title: 'Hizmetlerimiz | Uçtan Uca Çözümler',
+      description: 'Web geliştirme, e-ticaret yönetimi ve dijital pazarlama alanlarında HeyAlls güvencesiyle sunduğumuz entegre hizmet paketleri.',
     });
   }, []);
 
   return (
     <div className="relative min-h-screen w-full bg-[#001a2c] text-white selection:bg-white/20">
       <VideoBackground overlayOpacity="dark" />
-
       <Navbar activePage="services" />
 
       <main className="relative z-10 flex flex-col items-center justify-center text-center px-6 pt-24 pb-16">
-        <span className="text-xs font-medium uppercase tracking-widest text-white/50 block mb-4">
-          Uzmanlık Alanlarımız
+        <span className="text-xs font-medium uppercase tracking-widest text-white/50 block mb-4 animate-fade-rise">
+          Hizmet Yelpazemiz
         </span>
         <h1
           className="text-5xl md:text-7xl leading-[0.95] tracking-[-2.46px] max-w-4xl font-normal text-white animate-fade-rise"
           style={displayFont}
         >
-          Sınırları aşan markalar için{' '}
-          <em className="not-italic text-white/60">kapsamlı çözümler.</em>
+          Dijitalde,{' '}
+          <em className="not-italic text-white/60">uçtan uca hakemlik.</em>
         </h1>
         <p className="text-white/60 text-base sm:text-lg max-w-2xl mt-8 leading-relaxed font-body animate-fade-rise-delay">
-          HeyAlls, standart bir ajansın ötesinde, güvenilir çözüm ortaklıklarını elit operasyonel
-          yeteneklerle eşleştiren denetlenmiş bir ağ platformudur. İşte vizyonunuzu gerçeğe
-          dönüştürdüğümüz ana hatlar.
+          İhtiyacınız olan her şeyi parçalar halinde dışarıda aramayın. HeyAlls olarak markanızı sıfırdan alıyor, kodluyor, tasarlıyor ve küresel pazara hazırlıyoruz.
         </p>
       </main>
 
-      <section className="relative z-10 max-w-5xl mx-auto px-6 md:px-8 py-16 space-y-24">
-        {/* E-Commerce */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <div className="order-2 md:order-1">
-            <h2 className="text-4xl font-normal text-white mb-6" style={displayFont}>
-              Küresel E-Ticaret ve Yönetim.
-            </h2>
-            <p className="text-white/60 text-sm leading-relaxed mb-4">
-              Yerel pazarlara sıkışıp kalmayın. Ürünlerinizi uluslararası standartlarda
-              konumlandırarak global pazar yerlerinde rekabet edebilir hale getiriyoruz.
-            </p>
-            <ul className="text-sm text-white/80 space-y-3 mt-6">
-              <li className="flex items-start gap-3">
-                <span className="text-blue-400">✓</span>
-                Etsy ve Shopify gibi küresel pazar yeri trend analizleri ve optimizasyonları.
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-blue-400">✓</span>
-                Sınır ötesi e-ticaret için yüksek standartlarda katalog ve ürün veri yönetimi.
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-blue-400">✓</span>
-                Dönüşüm odaklı vitrin tasarımı ve güven brokerlığı operasyonları.
-              </li>
-            </ul>
-          </div>
-          <div className="order-1 md:order-2 liquid-glass w-full aspect-square md:aspect-[4/3] rounded-[2rem] flex items-center justify-center bg-gradient-to-br from-white/5 to-transparent shadow-inner group">
-            <span className="text-6xl transition-transform duration-500 group-hover:scale-110">🌍</span>
-          </div>
-        </div>
-
-        {/* Web */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <div className="liquid-glass w-full aspect-square md:aspect-[4/3] rounded-[2rem] flex items-center justify-center bg-gradient-to-br from-white/5 to-transparent shadow-inner group">
-            <span className="text-6xl transition-transform duration-500 group-hover:scale-110">💻</span>
-          </div>
-          <div>
-            <h2 className="text-4xl font-normal text-white mb-6" style={displayFont}>
-              Kapsayıcı İnteraktif Web Ortamları.
-            </h2>
-            <p className="text-white/60 text-sm leading-relaxed mb-4">
-              Dijital dünyadaki eviniz, markanızın en büyük prestij kaynağıdır. Hazır ve hantal
-              şablonları reddediyoruz. Markanıza özel, yüksek performanslı ve kullanıcıyı büyüleyen
-              mimariler inşa ediyoruz.
-            </p>
-            <ul className="text-sm text-white/80 space-y-3 mt-6">
-              <li className="flex items-start gap-3">
-                <span className="text-blue-400">✓</span>
-                Three.js ve GSAP entegrasyonlarıyla güçlendirilmiş akıcı, interaktif web deneyimleri.
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-blue-400">✓</span>
-                İhtiyacınıza tam uyumlu, özel kodlanmış WordPress CMS altyapıları.
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-blue-400">✓</span>
-                SEO uyumlu, ışık hızında yüklenen ve tüm cihazlarda kusursuz çalışan tasarımlar.
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Marketing */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <div className="order-2 md:order-1">
-            <h2 className="text-4xl font-normal text-white mb-6" style={displayFont}>
-              Stratejik Dijital Konumlandırma.
-            </h2>
-            <p className="text-white/60 text-sm leading-relaxed mb-4">
-              Harika bir ürün veya hizmet, doğru kitleye anlatılamadığında görünmez olur.
-              Markanızın hikayesini, doğru algı yönetimi ve veri odaklı performans pazarlaması ile
-              kitlelere ulaştırıyoruz.
-            </p>
-            <ul className="text-sm text-white/80 space-y-3 mt-6">
-              <li className="flex items-start gap-3">
-                <span className="text-blue-400">✓</span>
-                Modern görsel ve işitsel araçlarla kurgulanmış sinematik içerik stratejileri.
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-blue-400">✓</span>
-                Hedef kitle analizi ve dönüşüm odaklı performans (Meta/Google) reklam kampanyaları.
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-blue-400">✓</span>
-                Marka sesinin oluşturulması ve kurumsal güvenilirliğin sosyal mecralarda inşası.
-              </li>
-            </ul>
-          </div>
-          <div className="liquid-glass w-full aspect-square md:aspect-[4/3] rounded-[2rem] flex items-center justify-center bg-gradient-to-br from-white/5 to-transparent shadow-inner group">
-            <span className="text-6xl transition-transform duration-500 group-hover:scale-110">👁️</span>
-          </div>
-        </div>
-      </section>
-
-      <section className="relative z-10 max-w-4xl mx-auto px-6 py-32 text-center">
-        <h3 className="text-4xl font-normal text-white mb-6" style={displayFont}>
-          Hazırsanız, Başlayalım.
-        </h3>
-        <p className="text-white/60 text-base mb-10">
-          Projelerinizi sadece dinlemiyor, doğru uzman ağıyla hayata geçiriyoruz.
-        </p>
+      <section className="relative z-10 max-w-6xl mx-auto px-6 md:px-8 py-16 grid grid-cols-1 md:grid-cols-3 gap-8">
         
-        <Link
-          to="/#intake"
-          className="liquid-glass rounded-full px-12 py-4 text-base text-white transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer inline-block border border-white/20 hover:border-white/50"
-        >
-          Projeyi Değerlendirin
-        </Link>
+        {/* Paket 1 */}
+        <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-[2rem] p-8 hover:bg-white/10 transition-all duration-500 flex flex-col h-full">
+          <div className="w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center mb-6">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
+          </div>
+          <h3 className="text-2xl mb-4 text-white" style={displayFont}>Web Mimarisi & Geliştirme</h3>
+          <p className="text-white/60 text-sm leading-relaxed flex-grow">
+            Dinamik animasyonlar ve esnek altyapılarla markanızın dijital vitrinini inşa ediyoruz. Sadece güzel görünen değil, hızlı ve SEO uyumlu web sistemleri kuruyoruz.
+          </p>
+          <ul className="text-sm text-white/40 mt-6 space-y-2">
+            <li className="flex items-center gap-2">▪ Modern UI/UX Tasarımı</li>
+            <li className="flex items-center gap-2">▪ Kurumsal Web & Blog Altyapıları</li>
+            <li className="flex items-center gap-2">▪ Topluluk & Platform Yönetimi</li>
+          </ul>
+        </div>
+
+        {/* Paket 2 */}
+        <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-[2rem] p-8 hover:bg-white/10 transition-all duration-500 flex flex-col h-full">
+          <div className="w-12 h-12 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center mb-6">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+          </div>
+          <h3 className="text-2xl mb-4 text-white" style={displayFont}>Küresel E-Ticaret</h3>
+          <p className="text-white/60 text-sm leading-relaxed flex-grow">
+            Ürünlerinizi yerel ve global pazaryerlerinde başarıyla konumlandırıyoruz. Sınır ötesi e-ticaret süreçlerinde entegre mağaza ve dönüşüm yönetimi sağlıyoruz.
+          </p>
+          <ul className="text-sm text-white/40 mt-6 space-y-2">
+            <li className="flex items-center gap-2">▪ Mağaza Kurulumu & Optimizasyonu</li>
+            <li className="flex items-center gap-2">▪ Katalog ve Vitrin Yönetimi</li>
+            <li className="flex items-center gap-2">▪ Yurt Dışı Pazaryeri Entegrasyonları</li>
+          </ul>
+        </div>
+
+        {/* Paket 3 */}
+        <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-[2rem] p-8 hover:bg-white/10 transition-all duration-500 flex flex-col h-full">
+          <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-6">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
+          </div>
+          <h3 className="text-2xl mb-4 text-white" style={displayFont}>Dijital Marka & Pazarlama</h3>
+          <p className="text-white/60 text-sm leading-relaxed flex-grow">
+            Markanızın dijitaldeki sesini bulmasını sağlıyoruz. Hedef kitleye özel içerik stratejileri ve dönüşüm odaklı performans reklamlarıyla büyümenizi hızlandırıyoruz.
+          </p>
+          <ul className="text-sm text-white/40 mt-6 space-y-2">
+            <li className="flex items-center gap-2">▪ Sosyal Medya Yönetimi</li>
+            <li className="flex items-center gap-2">▪ Meta & Google Ads Reklamları</li>
+            <li className="flex items-center gap-2">▪ Kurumsal Kimlik & İçerik Stratejisi</li>
+          </ul>
+        </div>
+
       </section>
 
       <footer className="relative z-10 w-full text-center py-8 text-xs tracking-widest text-white/40 border-t border-white/5 bg-[#001a2c]/80 backdrop-blur-md">
         © 2026 HEYALLS. TÜM HAKLARI SAKLIDIR.
       </footer>
     </div>
-  )
+  );
 }
