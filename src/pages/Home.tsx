@@ -81,8 +81,8 @@ export default function Home() {
         </a>
       </main>
 
-      {/* Güven Sinyalleri & Metrikler (YENİ EKLENEN BÖLÜM) */}
-      <section className="relative z-10 w-full max-w-5xl mx-auto px-6 pb-20">
+      {/* Güven Sinyalleri & Metrikler */}
+      <section className="relative z-10 w-full max-w-5xl mx-auto px-6 pb-12">
         <div className="bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl">
           
           <div className="text-center md:text-left flex-1">
@@ -100,16 +100,16 @@ export default function Home() {
           <div className="hidden md:block w-px h-16 bg-gradient-to-b from-transparent via-white/10 to-transparent"></div>
 
           <div className="text-center md:text-left flex-1">
-            <h4 className="text-4xl text-white mb-2" style={displayFont}>Tek</h4>
-            <p className="text-white/50 text-xs tracking-widest uppercase">Merkezden Entegre Yönetim</p>
+            <h4 className="text-4xl text-white mb-2" style={displayFont}>1</h4>
+            <p className="text-white/50 text-xs tracking-widest uppercase">Merkez, Uçtan Uca Yönetim</p>
           </div>
 
         </div>
 
-        {/* Birlikte Büyüttüğümüz Markalar */}
+        {/* Birlikte Büyüttüğümüz Markalar (Erişilebilirlik Düzeltildi) */}
         <div className="mt-12 text-center">
           <p className="text-white/40 text-xs tracking-widest uppercase mb-8">Altyapısını Kurduğumuz Markalar</p>
-          <div className="flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+          <div className="flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-50 hover:opacity-100 transition-opacity duration-500">
             <span className="text-2xl text-white font-medium tracking-wider" style={displayFont}>Bimeeting</span>
             <span className="text-2xl text-white font-medium tracking-wider" style={displayFont}>Orimo Auto</span>
             <span className="text-2xl text-white font-medium tracking-wider" style={displayFont}>Carreas</span>
@@ -118,7 +118,27 @@ export default function Home() {
       </section>
 
       {/* İletişim / Intake Formu */}
-      <section id="intake" className="relative z-10 max-w-4xl mx-auto px-6 md:px-8 py-20">
+      <section id="intake" className="relative z-10 max-w-4xl mx-auto px-6 md:px-8 py-12 md:py-20">
+        
+        {/* YENİ: Müşteri Yorumu (Testimonial) */}
+        <div className="mb-16">
+          <div className="bg-white/5 backdrop-blur-lg rounded-[2rem] p-8 md:p-12 border border-white/10 relative shadow-2xl">
+            <div className="absolute -top-4 left-8 text-7xl text-white/10 font-serif leading-none">"</div>
+            <p className="text-white/80 text-lg md:text-xl leading-relaxed italic mb-8 relative z-10">
+              "Klasik ajans modelinin hantallığından kurtulup, web mimarisinden pazarlamaya kadar tek bir entegre ekiple çalışmak harika bir deneyimdi. Operasyonel hızımız ve metriklerimizdeki artış kesinlikle tesadüf değil."
+            </p>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full border border-white/20 bg-white/5 flex items-center justify-center text-white font-bold">
+                M
+              </div>
+              <div>
+                <h4 className="text-white font-medium text-sm md:text-base">Müşteri Adı</h4>
+                <p className="text-white/40 text-[10px] md:text-xs tracking-widest uppercase">Marka Yöneticisi</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="bg-white/5 backdrop-blur-lg rounded-[2rem] p-6 md:p-14 border border-white/10 shadow-2xl">
           <div className="text-center mb-10 md:mb-12">
             <span className="text-xs font-medium uppercase tracking-widest text-white/50 block mb-3 md:mb-4">
@@ -136,6 +156,7 @@ export default function Home() {
             </p>
           </div>
 
+          {/* Form UX Düzeltmeleri Yapıldı (htmlFor & id) */}
           <form ref={formRef} onSubmit={sendEmail} onChange={() => setIsError(false)} className="space-y-8">
             <input
               type="hidden"
@@ -143,7 +164,6 @@ export default function Home() {
               value={services.find((s) => s.id === selectedService)?.label ?? 'Belirtilmedi'}
             />
 
-            {/* Hizmet Seçimi */}
             <div className="space-y-4">
               <label className="text-xs uppercase tracking-widest text-white/70">
                 Nasıl bir çözüm arıyorsunuz?
@@ -171,13 +191,13 @@ export default function Home() {
               )}
             </div>
 
-            {/* İsim & E-posta */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
               <div className="space-y-2">
-                <label className="text-xs uppercase tracking-widest text-white/70">
+                <label htmlFor="user_name" className="text-xs uppercase tracking-widest text-white/70 cursor-pointer">
                   İsim / Marka Adı
                 </label>
                 <input
+                  id="user_name"
                   type="text"
                   name="user_name"
                   required
@@ -186,10 +206,11 @@ export default function Home() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-xs uppercase tracking-widest text-white/70">
+                <label htmlFor="user_email" className="text-xs uppercase tracking-widest text-white/70 cursor-pointer">
                   İletişim (E-posta)
                 </label>
                 <input
+                  id="user_email"
                   type="email"
                   name="user_email"
                   required
@@ -199,12 +220,12 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Mesaj */}
             <div className="space-y-2 pt-4">
-              <label className="text-xs uppercase tracking-widest text-white/70">
+              <label htmlFor="message" className="text-xs uppercase tracking-widest text-white/70 cursor-pointer">
                 Beklentileriniz veya Proje Detayları
               </label>
               <textarea
+                id="message"
                 name="message"
                 required
                 rows={3}
@@ -213,7 +234,6 @@ export default function Home() {
               />
             </div>
 
-            {/* Gönder */}
             <div className="pt-8 text-center flex flex-col items-center">
               <button
                 type="submit"
