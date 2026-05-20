@@ -1,9 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef } from 'react'
 import emailjs from '@emailjs/browser'
 import Navbar from '@/components/Navbar'
 import VideoBackground from '@/components/VideoBackground'
+import Footer from '@/components/Footer'
 import { displayFont } from '@/utils/styles'
-import { updateSEO } from '@/utils/seo'
+import { useSEO } from '@/hooks/useSEO'
 
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID as string
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID as string
@@ -16,13 +17,10 @@ const services = [
 ]
 
 export default function Home() {
-  useEffect(() => {
-    updateSEO({
-      title: 'HeyAlls | Uçtan Uca Dijital Çözüm Merkezi',
-      description:
-        'Web mimarisinden küresel e-ticarete kadar tüm dijital süreçlerinizi tek merkezden yürüten entegre çözüm merkezi.',
-    })
-  }, [])
+  useSEO(
+    'HeyAlls | Uçtan Uca Dijital Çözüm Merkezi',
+    'Web mimarisinden küresel e-ticarete kadar tüm dijital süreçlerinizi tek merkezden yürüten entegre çözüm merkezi.'
+  )
 
   const [selectedService, setSelectedService] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
@@ -58,7 +56,7 @@ export default function Home() {
       <Navbar activePage="home" />
 
       {/* Hero */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-6 pt-20 md:pt-32 pb-24 md:pb-32">
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-6 pt-32 md:pt-40 pb-24 md:pb-32">
         <div className="inline-block mb-6 px-5 py-2 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm text-xs md:text-sm text-white/80 animate-fade-rise">
           Uçtan Uca Dijital Çözüm Merkezi
         </div>
@@ -71,7 +69,8 @@ export default function Home() {
           <em className="not-italic text-white/60">başlar.</em>
         </h1>
         <p className="text-white/60 text-base sm:text-lg max-w-2xl mt-8 leading-relaxed font-body animate-fade-rise-delay">
-          Web mimarisinden küresel e-ticarete kadar tüm dijital süreçlerinizi, deneyimli ekibimiz ve %100 güven temelli in-house altyapımızla tek bir çatı altında birleştiriyoruz.
+          Web mimarisinden küresel e-ticarete kadar tüm dijital süreçlerinizi, deneyimli ekibimiz
+          ve %100 güven temelli in-house altyapımızla tek bir çatı altında birleştiriyoruz.
         </p>
         <a
           href="#intake"
@@ -84,29 +83,23 @@ export default function Home() {
       {/* Güven Sinyalleri & Metrikler */}
       <section className="relative z-10 w-full max-w-5xl mx-auto px-6 pb-12">
         <div className="bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl">
-          
           <div className="text-center md:text-left flex-1">
             <h4 className="text-4xl text-white mb-2" style={displayFont}>3+</h4>
             <p className="text-white/50 text-xs tracking-widest uppercase">Ülkede Küresel Operasyon</p>
           </div>
-
-          <div className="hidden md:block w-px h-16 bg-gradient-to-b from-transparent via-white/10 to-transparent"></div>
-
+          <div className="hidden md:block w-px h-16 bg-gradient-to-b from-transparent via-white/10 to-transparent" />
           <div className="text-center md:text-left flex-1">
             <h4 className="text-4xl text-white mb-2" style={displayFont}>%100</h4>
             <p className="text-white/50 text-xs tracking-widest uppercase">Proje Teslim ve Başarı Oranı</p>
           </div>
-
-          <div className="hidden md:block w-px h-16 bg-gradient-to-b from-transparent via-white/10 to-transparent"></div>
-
+          <div className="hidden md:block w-px h-16 bg-gradient-to-b from-transparent via-white/10 to-transparent" />
           <div className="text-center md:text-left flex-1">
             <h4 className="text-4xl text-white mb-2" style={displayFont}>1</h4>
             <p className="text-white/50 text-xs tracking-widest uppercase">Merkez, Uçtan Uca Yönetim</p>
           </div>
-
         </div>
 
-        {/* Birlikte Büyüttüğümüz Markalar (Erişilebilirlik Düzeltildi) */}
+        {/* Markalar */}
         <div className="mt-12 text-center">
           <p className="text-white/40 text-xs tracking-widest uppercase mb-8">Altyapısını Kurduğumuz Markalar</p>
           <div className="flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-50 hover:opacity-100 transition-opacity duration-500">
@@ -117,26 +110,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* İletişim / Intake Formu */}
+      {/* İletişim Formu */}
       <section id="intake" className="relative z-10 max-w-4xl mx-auto px-6 md:px-8 py-12 md:py-20">
-        
-        {/* YENİ: Müşteri Yorumu (Testimonial) */}
-        <div className="mb-16">
-          <div className="bg-white/5 backdrop-blur-lg rounded-[2rem] p-8 md:p-12 border border-white/10 relative shadow-2xl">
-            <div className="absolute -top-4 left-8 text-7xl text-white/10 font-serif leading-none">"</div>
-            <p className="text-white/80 text-lg md:text-xl leading-relaxed italic mb-8 relative z-10">
-              "Klasik ajans modelinin hantallığından kurtulup, web mimarisinden pazarlamaya kadar tek bir entegre ekiple çalışmak harika bir deneyimdi. Operasyonel hızımız ve metriklerimizdeki artış kesinlikle tesadüf değil."
-            </p>
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full border border-white/20 bg-white/5 flex items-center justify-center text-white font-bold">
-                M
-              </div>
-              <div>
-                <h4 className="text-white font-medium text-sm md:text-base">Müşteri Adı</h4>
-                <p className="text-white/40 text-[10px] md:text-xs tracking-widest uppercase">Marka Yöneticisi</p>
-              </div>
-            </div>
-          </div>
+
+        {/* Çalışma Taahhüdü */}
+        <div className="mb-16 bg-white/5 backdrop-blur-lg rounded-[2rem] p-8 md:p-12 border border-white/10 text-center shadow-2xl">
+          <p className="text-white/40 text-xs tracking-widest uppercase mb-4">Çalışma Taahhüdümüz</p>
+          <p className="text-white/80 text-lg md:text-xl leading-relaxed" style={displayFont}>
+            Her proje, lansman öncesi tam kalite denetiminden geçer.
+            Teslimat gerçekleşene kadar süreç sizinle şeffaf biçimde paylaşılır.
+          </p>
         </div>
 
         <div className="bg-white/5 backdrop-blur-lg rounded-[2rem] p-6 md:p-14 border border-white/10 shadow-2xl">
@@ -144,19 +127,14 @@ export default function Home() {
             <span className="text-xs font-medium uppercase tracking-widest text-white/50 block mb-3 md:mb-4">
               Sisteme Dahil Olun
             </span>
-            <h2
-              className="text-3xl md:text-5xl font-normal tracking-tight text-white mb-4"
-              style={displayFont}
-            >
+            <h2 className="text-3xl md:text-5xl font-normal tracking-tight text-white mb-4" style={displayFont}>
               Birlikte Büyüyelim.
             </h2>
             <p className="text-white/60 text-sm md:text-base max-w-lg mx-auto">
-              HeyAlls ekosisteminde hangi rolde yer almak istediğinizi seçin. Uzman ekibimiz
-              sizinle iletişime geçsin.
+              HeyAlls ekosisteminde hangi rolde yer almak istediğinizi seçin. Uzman ekibimiz sizinle iletişime geçsin.
             </p>
           </div>
 
-          {/* Form UX Düzeltmeleri Yapıldı (htmlFor & id) */}
           <form ref={formRef} onSubmit={sendEmail} onChange={() => setIsError(false)} className="space-y-8">
             <input
               type="hidden"
@@ -185,9 +163,7 @@ export default function Home() {
                 ))}
               </div>
               {serviceError && (
-                <p className="text-red-400 text-xs mt-1 animate-pulse">
-                  Lütfen bir hizmet türü seçin.
-                </p>
+                <p className="text-red-400 text-xs mt-1 animate-pulse">Lütfen bir hizmet türü seçin.</p>
               )}
             </div>
 
@@ -259,9 +235,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="relative z-10 w-full text-center py-8 text-xs tracking-widest text-white/40 border-t border-white/5 bg-[#001a2c]/80 backdrop-blur-md">
-        © 2026 HEYALLS. TÜM HAKLARI SAKLIDIR.
-      </footer>
+      <Footer />
     </div>
   )
 }

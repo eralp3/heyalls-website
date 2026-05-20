@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Home from './pages/Home'
 import Services from './pages/Services'
 import Process from './pages/Process'
@@ -12,6 +12,7 @@ export default function App() {
         <Route path="/hizmetlerimiz" element={<Services />} />
         <Route path="/surecimiz" element={<Process />} />
         <Route path="/calismalarimiz" element={<Portfolio />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   )

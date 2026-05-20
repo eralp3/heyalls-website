@@ -1,27 +1,23 @@
-import { useEffect } from 'react';
-import Navbar from '@/components/Navbar';
-import VideoBackground from '@/components/VideoBackground';
-import { displayFont } from '@/utils/styles';
-import { updateSEO } from '@/utils/seo';
+import Navbar from '@/components/Navbar'
+import VideoBackground from '@/components/VideoBackground'
+import Footer from '@/components/Footer'
+import { displayFont } from '@/utils/styles'
+import { useSEO } from '@/hooks/useSEO'
 
 export default function Services() {
-  useEffect(() => {
-    updateSEO({
-      title: 'Hizmetlerimiz | Uçtan Uca Dijital Çözümler',
-      description: 'Web geliştirme, kurumsal web tasarım, e-ticaret sitesi, SEO yönetimi ve dijital pazarlama alanlarında entegre in-house hizmetlerimiz.',
-    });
-  }, []);
+  useSEO(
+    'Hizmetlerimiz | Uçtan Uca Dijital Çözümler',
+    'Web geliştirme, kurumsal web tasarım, e-ticaret sitesi, SEO yönetimi ve dijital pazarlama alanlarında entegre in-house hizmetlerimiz.'
+  )
 
-  // Kayan yazı şeridindeki kelimeler listesi
   const marqueeItems = [
-    'SEO YÖNETİMİ', 'TANITIM WEB SİTESİ', 'E-TİCARET SİTESİ', 
-    'KURUMSAL WEB TASARIM', 'MARKA KİMLİĞİ', 'ÖZEL WEB YAZILIM', 
+    'SEO YÖNETİMİ', 'TANITIM WEB SİTESİ', 'E-TİCARET SİTESİ',
+    'KURUMSAL WEB TASARIM', 'MARKA KİMLİĞİ', 'ÖZEL WEB YAZILIM',
     'MOBİL UYGULAMA GELİŞTİRME', 'SOSYAL MEDYA', 'DİJİTAL PAZARLAMA HİZMETLERİ'
-  ];
+  ]
 
   return (
     <div className="relative min-h-screen w-full bg-[#001a2c] text-white selection:bg-white/20 overflow-x-hidden">
-      {/* Kayan Yazı Animasyonu İçin CSS Enjeksiyonu */}
       <style>{`
         @keyframes marquee {
           0% { transform: translateX(0%); }
@@ -37,10 +33,9 @@ export default function Services() {
       <VideoBackground overlayOpacity="dark" />
       <Navbar activePage="services" />
 
-      {/* Premium Kayan Yazı Şeridi (Marquee Ticker) */}
-      <div className="relative z-10 w-full bg-white/[0.02] border-y border-white/5 py-4 mt-4 overflow-hidden select-none backdrop-blur-sm">
+      {/* Marquee */}
+      <div className="relative z-10 w-full bg-white/[0.02] border-y border-white/5 py-4 mt-20 overflow-hidden select-none backdrop-blur-sm">
         <div className="animate-marquee gap-16 pr-16 text-[11px] font-medium tracking-[0.2em] uppercase text-white/40">
-          {/* Sonsuz döngü için listeyi iki kez render ediyoruz */}
           {[...marqueeItems, ...marqueeItems].map((item, index) => (
             <div key={index} className="flex items-center gap-16 whitespace-nowrap">
               <span>{item}</span>
@@ -62,20 +57,23 @@ export default function Services() {
           <em className="not-italic text-white/60">uçtan uca hakemlik.</em>
         </h1>
         <p className="text-white/60 text-base sm:text-lg max-w-2xl mt-8 leading-relaxed font-body animate-fade-rise-delay">
-          İhtiyacınız olan her şeyi parçalar halinde dışarıda aramayın. HeyAlls olarak markanızı sıfırdan alıyor, kodluyor, tasarlıyor ve küresel pazara hazırlıyoruz.
+          İhtiyacınız olan her şeyi parçalar halinde dışarıda aramayın. HeyAlls olarak markanızı
+          sıfırdan alıyor, kodluyor, tasarlıyor ve küresel pazara hazırlıyoruz.
         </p>
       </main>
 
       <section className="relative z-10 max-w-6xl mx-auto px-6 md:px-8 py-12 grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-        
-        {/* Paket 1: Geliştirme */}
+        {/* Web & Yazılım */}
         <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-[2rem] p-8 hover:bg-white/10 transition-all duration-500 flex flex-col h-full group shadow-2xl">
           <div className="w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center mb-6 border border-blue-500/10">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+            </svg>
           </div>
           <h3 className="text-2xl mb-4 text-white group-hover:text-blue-400 transition-colors" style={displayFont}>Web & Yazılım</h3>
           <p className="text-white/60 text-sm leading-relaxed flex-grow">
-            Dinamik animasyonlar, esnek altyapılar ve modern arayüzlerle markanızın dijital dünyadaki kalelerini inşa ediyoruz. Hızlı, güvenli ve ölçeklenebilir kod mimarisi sunuyoruz.
+            Dinamik animasyonlar, esnek altyapılar ve modern arayüzlerle markanızın dijital dünyadaki
+            kalelerini inşa ediyoruz. Hızlı, güvenli ve ölçeklenebilir kod mimarisi sunuyoruz.
           </p>
           <ul className="text-sm text-white/40 mt-6 space-y-3 border-t border-white/5 pt-4">
             <li className="flex items-center gap-2.5"><span className="text-blue-400 text-xs">▪</span> Kurumsal Web Tasarım</li>
@@ -85,14 +83,17 @@ export default function Services() {
           </ul>
         </div>
 
-        {/* Paket 2: E-Ticaret */}
+        {/* E-Ticaret */}
         <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-[2rem] p-8 hover:bg-white/10 transition-all duration-500 flex flex-col h-full group shadow-2xl">
           <div className="w-12 h-12 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center mb-6 border border-purple-500/10">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
           </div>
           <h3 className="text-2xl mb-4 text-white group-hover:text-purple-400 transition-colors" style={displayFont}>E-Ticaret Dönüşümü</h3>
           <p className="text-white/60 text-sm leading-relaxed flex-grow">
-            Ürünlerinizi yerel ve küresel ekosistemlerde en doğru mimariyle konumlandırıyoruz. Sınır ötesi süreçlerde katalog yönetiminden entegrasyona kadar her şeyi üstleniyoruz.
+            Ürünlerinizi yerel ve küresel ekosistemlerde en doğru mimariyle konumlandırıyoruz.
+            Sınır ötesi süreçlerde katalog yönetiminden entegrasyona kadar her şeyi üstleniyoruz.
           </p>
           <ul className="text-sm text-white/40 mt-6 space-y-3 border-t border-white/5 pt-4">
             <li className="flex items-center gap-2.5"><span className="text-purple-400 text-xs">▪</span> E-Ticaret Sitesi Kurulumu</li>
@@ -102,14 +103,18 @@ export default function Services() {
           </ul>
         </div>
 
-        {/* Paket 3: Pazarlama */}
+        {/* Marka & Pazarlama */}
         <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-[2rem] p-8 hover:bg-white/10 transition-all duration-500 flex flex-col h-full group shadow-2xl">
           <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-6 border border-emerald-500/10">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+            </svg>
           </div>
           <h3 className="text-2xl mb-4 text-white group-hover:text-emerald-400 transition-colors" style={displayFont}>Marka & Pazarlama</h3>
           <p className="text-white/60 text-sm leading-relaxed flex-grow">
-            Markanızın dijital dünyada gür sesle konuşmasını sağlıyoruz. Hedef odaklı veri analitiği, kreatif içerik yönetimi ve akıllı reklam bütçesi yönetimiyle büyümeyi tetikliyoruz.
+            Markanızın dijital dünyada gür sesle konuşmasını sağlıyoruz. Hedef odaklı veri analitiği,
+            kreatif içerik yönetimi ve akıllı reklam bütçesi yönetimiyle büyümeyi tetikliyoruz.
           </p>
           <ul className="text-sm text-white/40 mt-6 space-y-3 border-t border-white/5 pt-4">
             <li className="flex items-center gap-2.5"><span className="text-emerald-400 text-xs">▪</span> Marka Kimliği Tasarımı</li>
@@ -118,12 +123,9 @@ export default function Services() {
             <li className="flex items-center gap-2.5"><span className="text-emerald-400 text-xs">▪</span> Üst Düzey SEO Yönetimi</li>
           </ul>
         </div>
-
       </section>
 
-      <footer className="relative z-10 w-full text-center py-8 text-xs tracking-widest text-white/40 border-t border-white/5 bg-[#001a2c]/80 backdrop-blur-md">
-        © 2026 HEYALLS. TÜM HAKLARI SAKLIDIR.
-      </footer>
+      <Footer />
     </div>
-  );
+  )
 }

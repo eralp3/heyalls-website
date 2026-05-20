@@ -1,4 +1,4 @@
-import { BG_VIDEO_URL } from '@/utils/styles' // veya constants — tutarlı olsun
+import { BG_VIDEO_URL } from '@/utils/styles'
 
 interface VideoBackgroundProps {
   overlayOpacity?: 'light' | 'dark'
