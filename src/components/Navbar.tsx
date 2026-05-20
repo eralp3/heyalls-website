@@ -26,8 +26,8 @@ export default function Navbar({ activePage }: NavbarProps) {
   return (
     <header className="fixed top-0 left-0 z-[9999] w-full bg-[#001a2c]/90 backdrop-blur-lg border-b border-white/5 transition-all duration-300">
       <div className="px-6 md:px-8 py-4 max-w-7xl mx-auto flex flex-row justify-between items-center relative z-[110]">
-        <Link to="/" className="text-2xl font-medium text-white flex items-center gap-1" style={displayFont}>
-          <span className="text-blue-500">H</span>eyAlls
+<Link to="/" className="text-2xl font-medium text-white flex items-center gap-1" style={displayFont}>
+          HeyAlls
         </Link>
         {/* Masaüstü Menü */}
         <nav className="hidden md:flex flex-row gap-8 items-center">
