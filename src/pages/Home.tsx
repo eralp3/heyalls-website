@@ -1,26 +1,26 @@
 import React, { useState, useRef, useEffect } from 'react'
 import emailjs from '@emailjs/browser'
-import Navbar from '@/components/Navbar' // Düzeltildi
-import VideoBackground from '@/components/VideoBackground' // Düzeltildi
-import { displayFont } from '@/utils/styles' // Düzeltildi: styles
-import { updateSEO } from '@/utils/seo' // Düzeltildi: @/utils/seo
+import Navbar from '@/components/Navbar'
+import VideoBackground from '@/components/VideoBackground'
+import { displayFont } from '@/utils/styles'
+import { updateSEO } from '@/utils/seo'
 
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID as string
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID as string
 const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY as string
 
 const services = [
-  { id: 'hizmet-al', label: 'Güvenilir Hizmet Almak İstiyorum' },
-  { id: 'cozum-ortagi', label: 'Onaylı Çözüm Ortağı Olmak İstiyorum' },
+  { id: 'hizmet-al', label: 'Projem İçin Hizmet Almak İstiyorum' },
+  { id: 'cozum-ortagi', label: 'Onaylı Çözüm Ortağı Ağına Katıl' },
   { id: 'danismanlik', label: 'Proje Danışmanlığı' },
 ]
 
 export default function Home() {
   useEffect(() => {
     updateSEO({
-      title: 'Onaylı Çözüm Ortaklığı Ağı',
+      title: 'HeyAlls | Uçtan Uca Dijital Çözüm Merkezi',
       description:
-        'HeyAlls – Güvenilir hizmet sağlayıcıları, şeffaf komisyon modeli ve %100 güven temelli pazar yeri altyapısıyla tek çatı altında.',
+        'Web mimarisinden küresel e-ticarete kadar tüm dijital süreçlerinizi tek merkezden yürüten entegre çözüm merkezi.',
     })
   }, [])
 
@@ -58,42 +58,77 @@ export default function Home() {
       <Navbar activePage="home" />
 
       {/* Hero */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-6 pt-20 md:pt-32 pb-32 md:pb-40">
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-6 pt-20 md:pt-32 pb-24 md:pb-32">
         <div className="inline-block mb-6 px-5 py-2 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm text-xs md:text-sm text-white/80 animate-fade-rise">
-          Güven Odaklı Çözüm Ortaklığı Ağı
+          Uçtan Uca Dijital Çözüm Merkezi
         </div>
         <h1
           className="text-5xl sm:text-7xl md:text-8xl leading-[0.95] tracking-[-2.46px] max-w-7xl font-normal text-white animate-fade-rise"
           style={displayFont}
         >
-          Doğru hizmet,{' '}
-          <em className="not-italic text-white/60">onaylı ağımızla</em>{' '}
+          Dijitalde büyüme,{' '}
+          <em className="not-italic text-white/60">entegre sistemimizle</em>{' '}
           <em className="not-italic text-white/60">başlar.</em>
         </h1>
         <p className="text-white/60 text-base sm:text-lg max-w-2xl mt-8 leading-relaxed font-body animate-fade-rise-delay">
-          Sektörün en seçkin hizmet sağlayıcılarını, şeffaf komisyon modeli ve %100 güven temelli
-          pazar yeri altyapımızla tek bir çatı altında birleştiriyoruz.
+          Web mimarisinden küresel e-ticarete kadar tüm dijital süreçlerinizi, deneyimli ekibimiz ve %100 güven temelli in-house altyapımızla tek bir çatı altında birleştiriyoruz.
         </p>
         <a
           href="#intake"
           className="bg-white/10 backdrop-blur-md rounded-full px-12 md:px-14 py-4 md:py-5 text-base text-white mt-10 transition-transform duration-300 hover:scale-[1.03] active:scale-[0.98] inline-block text-center cursor-pointer border border-white/10 animate-fade-rise-delay-2"
         >
-          Hemen Değerlendirin
+          Projeyi Başlat
         </a>
       </main>
 
+      {/* Güven Sinyalleri & Metrikler (YENİ EKLENEN BÖLÜM) */}
+      <section className="relative z-10 w-full max-w-5xl mx-auto px-6 pb-20">
+        <div className="bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl">
+          
+          <div className="text-center md:text-left flex-1">
+            <h4 className="text-4xl text-white mb-2" style={displayFont}>3+</h4>
+            <p className="text-white/50 text-xs tracking-widest uppercase">Ülkede Küresel Operasyon</p>
+          </div>
+
+          <div className="hidden md:block w-px h-16 bg-gradient-to-b from-transparent via-white/10 to-transparent"></div>
+
+          <div className="text-center md:text-left flex-1">
+            <h4 className="text-4xl text-white mb-2" style={displayFont}>%100</h4>
+            <p className="text-white/50 text-xs tracking-widest uppercase">Proje Teslim ve Başarı Oranı</p>
+          </div>
+
+          <div className="hidden md:block w-px h-16 bg-gradient-to-b from-transparent via-white/10 to-transparent"></div>
+
+          <div className="text-center md:text-left flex-1">
+            <h4 className="text-4xl text-white mb-2" style={displayFont}>Tek</h4>
+            <p className="text-white/50 text-xs tracking-widest uppercase">Merkezden Entegre Yönetim</p>
+          </div>
+
+        </div>
+
+        {/* Birlikte Büyüttüğümüz Markalar */}
+        <div className="mt-12 text-center">
+          <p className="text-white/40 text-xs tracking-widest uppercase mb-8">Altyapısını Kurduğumuz Markalar</p>
+          <div className="flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+            <span className="text-2xl text-white font-medium tracking-wider" style={displayFont}>Bimeeting</span>
+            <span className="text-2xl text-white font-medium tracking-wider" style={displayFont}>Orimo Auto</span>
+            <span className="text-2xl text-white font-medium tracking-wider" style={displayFont}>Carreas</span>
+          </div>
+        </div>
+      </section>
+
       {/* İletişim / Intake Formu */}
-      <section id="intake" className="relative z-10 max-w-4xl mx-auto px-6 md:px-8 py-20 md:py-32">
+      <section id="intake" className="relative z-10 max-w-4xl mx-auto px-6 md:px-8 py-20">
         <div className="bg-white/5 backdrop-blur-lg rounded-[2rem] p-6 md:p-14 border border-white/10 shadow-2xl">
           <div className="text-center mb-10 md:mb-12">
             <span className="text-xs font-medium uppercase tracking-widest text-white/50 block mb-3 md:mb-4">
-              Platforma Dahil Olun
+              Sisteme Dahil Olun
             </span>
             <h2
               className="text-3xl md:text-5xl font-normal tracking-tight text-white mb-4"
               style={displayFont}
             >
-              Birlikte Güven İnşa Edelim.
+              Birlikte Büyüyelim.
             </h2>
             <p className="text-white/60 text-sm md:text-base max-w-lg mx-auto">
               HeyAlls ekosisteminde hangi rolde yer almak istediğinizi seçin. Uzman ekibimiz
@@ -167,7 +202,7 @@ export default function Home() {
             {/* Mesaj */}
             <div className="space-y-2 pt-4">
               <label className="text-xs uppercase tracking-widest text-white/70">
-                Beklentileriniz veya Sunduğunuz Çözümler
+                Beklentileriniz veya Proje Detayları
               </label>
               <textarea
                 name="message"
@@ -191,7 +226,7 @@ export default function Home() {
               </button>
               {isSuccess && (
                 <p className="text-green-400 mt-4 text-sm animate-fade-rise">
-                  Talebiniz başarıyla alındı. Dönüş yapılacaktır.
+                  Talebiniz başarıyla alındı. En kısa sürede dönüş yapılacaktır.
                 </p>
               )}
               {isError && (

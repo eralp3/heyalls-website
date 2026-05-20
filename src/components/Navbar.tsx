@@ -25,7 +25,7 @@ export default function Navbar({ activePage }: NavbarProps) {
   const closeMobile = () => setIsMobileMenuOpen(false)
 
   return (
-    <nav className="relative z-50 w-full px-6 md:px-8 py-6 max-w-7xl mx-auto flex flex-row justify-between items-center">
+    <nav className="sticky top-0 z-50 w-full px-6 md:px-8 py-4 max-w-7xl mx-auto flex flex-row justify-between items-center bg-[#001a2c]/90 backdrop-blur-lg border-b border-white/5 transition-all duration-300">
       <Link
         to="/"
         className="text-3xl tracking-tight text-white select-none relative z-50"
