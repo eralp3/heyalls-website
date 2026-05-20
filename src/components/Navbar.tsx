@@ -1,105 +1,101 @@
-import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { displayFont } from '@/utils/styles' // Düzeltildi: @/utils/styles
+import React, { useState, useEffect } from 'react';
+import { displayFont } from '@/utils/styles';
 
 interface NavbarProps {
-  activePage?: 'home' | 'services' | 'process' | 'portfolio'
+  activePage?: 'home' | 'process' | 'services' | 'portfolio';
 }
 
 export default function Navbar({ activePage }: NavbarProps) {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
 
+  // Mobil menü açıkken arka sayfanın kaymasını (scroll) engeller
   useEffect(() => {
-    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : ''
-    return () => {
-      document.body.style.overflow = ''
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
     }
-  }, [isMobileMenuOpen])
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [isOpen]);
 
-  const activeClass =
-    'text-sm text-white transition-colors relative after:absolute after:bottom-[-4px] after:left-0 after:w-full after:h-[1px] after:bg-white/40'
-  const inactiveClass = 'text-sm text-white/60 hover:text-white transition-colors'
-  const mobileActiveClass = 'text-xl text-white font-medium transition-colors'
-  const mobileInactiveClass = 'text-xl text-white/60 hover:text-white transition-colors'
-
-  const closeMobile = () => setIsMobileMenuOpen(false)
+  const navLinks = [
+    { name: 'Ana Sayfa', href: '/', id: 'home' },
+    { name: 'Sürecimiz', href: '/process', id: 'process' },
+    { name: 'Hizmetlerimiz', href: '/services', id: 'services' },
+  ];
 
   return (
-    <nav className="sticky top-0 z-50 w-full px-6 md:px-8 py-4 max-w-7xl mx-auto flex flex-row justify-between items-center bg-[#001a2c]/90 backdrop-blur-lg border-b border-white/5 transition-all duration-300">
-      <Link
-        to="/"
-        className="text-3xl tracking-tight text-white select-none relative z-50"
-        style={displayFont}
-        onClick={closeMobile}
-      >
-        HeyAlls<sup className="text-xs font-sans ml-0.5">®</sup>
-      </Link>
-
-      {/* Masaüstü Menü */}
-      <div className="hidden md:flex flex-row items-center gap-8">
-        <Link to="/" className={activePage === 'home' ? activeClass : inactiveClass}>
-          Ana Sayfa
-        </Link>
-        <Link to="/hizmetlerimiz" className={activePage === 'services' ? activeClass : inactiveClass}>
-          Onaylı Ortaklar
-        </Link>
-        <Link to="/surecimiz" className={activePage === 'process' ? activeClass : inactiveClass}>
-          Nasıl Çalışır?
-        </Link>
-        <Link to="/calismalarimiz" className={activePage === 'portfolio' ? activeClass : inactiveClass}>
-          Çalışmalarımız
-        </Link>
-        <a
-          href="/#intake"
-          className="bg-white/10 backdrop-blur-md rounded-full px-6 py-2.5 text-sm text-white transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] cursor-pointer border border-white/10 hover:border-white/30"
-        >
-          Ağa Katıl
+    <header className="sticky top-0 z-[100] w-full bg-[#001a2c]/90 backdrop-blur-lg border-b border-white/5 transition-all duration-300">
+      <div className="px-6 md:px-8 py-4 max-w-7xl mx-auto flex flex-row justify-between items-center relative z-[110]">
+        
+        {/* Logo */}
+        <a href="/" className="text-2xl font-medium text-white flex items-center gap-1" style={displayFont}>
+          <span className="text-blue-500">H</span>eyAlls
         </a>
+
+        {/* Masaüstü Menü */}
+        <nav className="hidden md:flex flex-row gap-8 items-center">
+          {navLinks.map((link) => (
+            <a
+              key={link.id}
+              href={link.href}
+              className={`text-sm tracking-wide transition-colors duration-300 ${
+                activePage === link.id ? 'text-white font-medium' : 'text-white/50 hover:text-white'
+              }`}
+            >
+              {link.name}
+            </a>
+          ))}
+          <a
+            href="/#intake"
+            className="bg-white/10 backdrop-blur-md border border-white/20 text-white px-6 py-2 rounded-full text-sm font-medium transition-all hover:bg-white hover:text-black"
+          >
+            Projeyi Başlat
+          </a>
+        </nav>
+
+        {/* Mobil Hamburger Butonu */}
+        <button
+          className="md:hidden flex flex-col gap-[5px] p-2 focus:outline-none"
+          onClick={() => setIsOpen(!isOpen)}
+          aria-label="Menüyü Aç/Kapat"
+        >
+          <div className={`w-6 h-[2px] bg-white transition-all duration-300 origin-left ${isOpen ? 'rotate-45 translate-x-[2px] -translate-y-[1px]' : ''}`}></div>
+          <div className={`w-6 h-[2px] bg-white transition-all duration-300 ${isOpen ? 'opacity-0 translate-x-4' : ''}`}></div>
+          <div className={`w-6 h-[2px] bg-white transition-all duration-300 origin-left ${isOpen ? '-rotate-45 translate-x-[2px] translate-y-[1px]' : ''}`}></div>
+        </button>
       </div>
 
-      {/* Mobil Hamburger */}
-      <button
-        className="md:hidden relative z-50 text-white p-2 focus:outline-none"
-        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        aria-label={isMobileMenuOpen ? 'Menüyü kapat' : 'Menüyü aç'}
-      >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          {isMobileMenuOpen ? (
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          ) : (
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          )}
-        </svg>
-      </button>
-
-      {/* Mobil Açılır Menü */}
+      {/* Mobil Tam Ekran Menü (Overlay) */}
       <div
-        className={`md:hidden fixed inset-0 bg-[#001a2c]/98 backdrop-blur-2xl z-40 transition-all duration-300 flex flex-col items-center justify-center space-y-8 ${
-          isMobileMenuOpen
-            ? 'opacity-100 visible pointer-events-auto'
-            : 'opacity-0 invisible pointer-events-none'
+        className={`fixed inset-0 min-h-screen bg-[#001a2c]/95 backdrop-blur-xl z-[105] flex flex-col items-center justify-center gap-10 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] md:hidden ${
+          isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'
         }`}
       >
-        <Link to="/" onClick={closeMobile} className={activePage === 'home' ? mobileActiveClass : mobileInactiveClass}>
-          Ana Sayfa
-        </Link>
-        <Link to="/hizmetlerimiz" onClick={closeMobile} className={activePage === 'services' ? mobileActiveClass : mobileInactiveClass}>
-          Onaylı Ortaklar
-        </Link>
-        <Link to="/surecimiz" onClick={closeMobile} className={activePage === 'process' ? mobileActiveClass : mobileInactiveClass}>
-          Nasıl Çalışır?
-        </Link>
-        <Link to="/calismalarimiz" onClick={closeMobile} className={activePage === 'portfolio' ? mobileActiveClass : mobileInactiveClass}>
-          Çalışmalarımız
-        </Link>
+        <div className="flex flex-col items-center gap-8">
+          {navLinks.map((link) => (
+            <a
+              key={link.id}
+              href={link.href}
+              onClick={() => setIsOpen(false)} // Linke tıklayınca menüyü kapat
+              className={`text-4xl font-normal transition-colors duration-300 ${
+                activePage === link.id ? 'text-white' : 'text-white/50'
+              }`}
+              style={displayFont}
+            >
+              {link.name}
+            </a>
+          ))}
+        </div>
+        
         <a
           href="/#intake"
-          onClick={closeMobile}
-          className="bg-white/10 backdrop-blur-md rounded-full px-8 py-3 text-lg text-white mt-4 border border-white/10"
+          onClick={() => setIsOpen(false)}
+          className="mt-8 bg-white text-[#001a2c] px-10 py-4 rounded-full text-lg font-medium transition-transform active:scale-95"
         >
-          Ağa Katıl
+          Projeyi Başlat
         </a>
       </div>
-    </nav>
-  )
+    </header>
+  );
 }
