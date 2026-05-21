@@ -99,25 +99,64 @@ export default function Home() {
             <p className="text-white/50 text-xs tracking-widest uppercase">Merkez, Uçtan Uca Yönetim</p>
           </div>
         </div>
+      </section>
 
-        {/* Referanslar Bölümü */}
-        <div className="mt-16 w-full">
-          <p className="text-white/40 text-xs tracking-widest uppercase mb-12 text-center">Çözüm Ortaklığı Kurduğumuz Markalar</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {[
-              { name: 'Bimeeting', desc: 'Konuşma Kulübü Altyapısı' },
-              { name: 'Orimo Auto', desc: 'Global Katalog Entegrasyonu' },
-              { name: 'Carreas', desc: 'E-Ticaret & SEO Dönüşümü' }
-            ].map((ref) => (
-              <Link 
-                key={ref.name} 
-                to="/calismalarimiz" 
-                className="group p-6 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-white/20 transition-all duration-500 cursor-pointer block text-left"
-              >
-                <h3 className="text-xl text-white font-medium mb-1 transition-colors group-hover:text-blue-400" style={displayFont}>{ref.name}</h3>
-                <p className="text-white/40 text-xs tracking-wider uppercase">{ref.desc}</p>
-              </Link>
-            ))}
+      {/* BIG AGENCY - BENTO GRID VİTRİNİ */}
+      <section className="relative z-10 w-full pb-20 mt-12">
+        <div className="w-full max-w-7xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-white/10 pb-6">
+            <div>
+              <span className="text-blue-500 text-xs tracking-widest uppercase mb-2 block font-medium">Seçkin Operasyonlar</span>
+              <h2 className="text-4xl md:text-5xl text-white font-normal" style={displayFont}>Çözüm Ortaklarımız</h2>
+            </div>
+            <Link to="/calismalarimiz" className="text-white/50 hover:text-white text-sm transition-colors flex items-center gap-2 pb-2 md:pb-0">
+              Tüm Ekosistemi İncele <span className="text-blue-500">→</span>
+            </Link>
+          </div>
+
+          {/* Bento Grid Yapısı */}
+          <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4 md:h-[600px]">
+            
+            {/* Büyük Kart - Bimeeting */}
+            <Link to="/calismalarimiz" className="group relative col-span-1 md:col-span-2 md:row-span-2 rounded-3xl overflow-hidden bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all duration-700 block">
+              <div className="absolute inset-0 bg-gradient-to-t from-[#001a2c] via-transparent to-transparent z-10 opacity-80 group-hover:opacity-60 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-blue-500/5 group-hover:bg-blue-500/10 transition-colors duration-500" />
+              <div className="absolute bottom-0 left-0 p-8 z-20 w-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                <span className="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-[10px] text-white/70 uppercase tracking-widest border border-white/10 mb-4 inline-block">Platform Mimarisi</span>
+                <h3 className="text-4xl text-white mb-2" style={displayFont}>Bimeeting</h3>
+                <p className="text-white/50 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">Modern dil öğrenim vizyonu ve topluluk yönetimi altyapısı.</p>
+              </div>
+            </Link>
+
+            {/* Orta Kart - Orimo Auto */}
+            <Link to="/calismalarimiz" className="group relative col-span-1 md:col-span-2 md:row-span-1 rounded-3xl overflow-hidden bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all duration-700 block min-h-[250px]">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#001a2c] via-transparent to-transparent z-10 opacity-80" />
+              <div className="absolute inset-0 bg-purple-500/5 group-hover:bg-purple-500/10 transition-colors duration-500" />
+              <div className="absolute bottom-0 left-0 p-6 z-20 w-full transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+                <span className="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-[10px] text-white/70 uppercase tracking-widest border border-white/10 mb-3 inline-block">Global E-Ticaret</span>
+                <h3 className="text-3xl text-white mb-1" style={displayFont}>Orimo Auto</h3>
+                <p className="text-white/50 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">Avrupa pazarı için katalog ve veri entegrasyonu.</p>
+              </div>
+            </Link>
+
+            {/* Küçük Kart 1 - Carreas */}
+            <Link to="/calismalarimiz" className="group relative col-span-1 md:col-span-1 md:row-span-1 rounded-3xl overflow-hidden bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all duration-700 block min-h-[250px]">
+              <div className="absolute inset-0 bg-gradient-to-t from-[#001a2c] via-transparent to-transparent z-10 opacity-80" />
+              <div className="absolute bottom-0 left-0 p-6 z-20 w-full transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+                <span className="text-[10px] text-white/50 uppercase tracking-widest mb-2 block">Dönüşüm & SEO</span>
+                <h3 className="text-2xl text-white" style={displayFont}>Carreas</h3>
+              </div>
+            </Link>
+
+            {/* Küçük Kart 2 - Çoklu Disiplin */}
+            <div className="group relative col-span-1 md:col-span-1 md:row-span-1 rounded-3xl overflow-hidden bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all duration-700 flex flex-col justify-center items-center text-center p-6 min-h-[250px] cursor-default">
+              <div className="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors duration-500" />
+              <div className="relative z-20">
+                <h3 className="text-xl text-white mb-3" style={displayFont}>Gür Sigorta & Patron Tour</h3>
+                <p className="text-white/40 text-xs leading-relaxed">Kurumsal kimlik inşasından, agresif Meta reklam operasyonlarına kadar tam kapsamlı yönetim.</p>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
