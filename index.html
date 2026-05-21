@@ -24,7 +24,21 @@
     <meta name="twitter:image" content="https://heyalls.com/og-image.jpg" />
   </head>
   <body>
+   <body class="bg-[#001a2c] text-white">
+    <div id="initial-loader" style="position: fixed; inset: 0; z-index: 99999; background-color: #001a2c; display: flex; align-items: center; justify-content: center; transition: opacity 0.8s ease-in-out, visibility 0.8s ease-in-out;">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+        <span style="font-family: 'Instrument Serif', serif; font-size: 2rem; letter-spacing: 0.1em; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;">HeyAlls</span>
+        <div style="width: 40px; height: 1px; background: rgba(255,255,255,0.2); position: relative; overflow: hidden;">
+          <div style="position: absolute; top: 0; left: 0; height: 100%; width: 50%; background: #fff; animation: loading-bar 1.5s ease-in-out infinite;"></div>
+        </div>
+      </div>
+    </div>
+    <style>
+      @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+      @keyframes loading-bar { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
+    </style>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
-</html>
+  </body>
+</html> 
