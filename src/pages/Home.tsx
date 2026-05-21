@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react'
 import emailjs from '@emailjs/browser'
+import { Link } from 'react-router-dom'
 import Navbar from '@/components/Navbar'
 import VideoBackground from '@/components/VideoBackground'
 import Footer from '@/components/Footer'
@@ -99,13 +100,24 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Markalar */}
-        <div className="mt-12 text-center">
-          <p className="text-white/40 text-xs tracking-widest uppercase mb-8">Altyapısını Kurduğumuz Markalar</p>
-          <div className="flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-50 hover:opacity-100 transition-opacity duration-500">
-            <span className="text-2xl text-white font-medium tracking-wider" style={displayFont}>Bimeeting</span>
-            <span className="text-2xl text-white font-medium tracking-wider" style={displayFont}>Orimo Auto</span>
-            <span className="text-2xl text-white font-medium tracking-wider" style={displayFont}>Carreas</span>
+        {/* Referanslar Bölümü */}
+        <div className="mt-16 w-full">
+          <p className="text-white/40 text-xs tracking-widest uppercase mb-12 text-center">Çözüm Ortaklığı Kurduğumuz Markalar</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {[
+              { name: 'Bimeeting', desc: 'Konuşma Kulübü Altyapısı' },
+              { name: 'Orimo Auto', desc: 'Global Katalog Entegrasyonu' },
+              { name: 'Carreas', desc: 'E-Ticaret & SEO Dönüşümü' }
+            ].map((ref) => (
+              <Link 
+                key={ref.name} 
+                to="/calismalarimiz" 
+                className="group p-6 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-white/20 transition-all duration-500 cursor-pointer block text-left"
+              >
+                <h3 className="text-xl text-white font-medium mb-1 transition-colors group-hover:text-blue-400" style={displayFont}>{ref.name}</h3>
+                <p className="text-white/40 text-xs tracking-wider uppercase">{ref.desc}</p>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
