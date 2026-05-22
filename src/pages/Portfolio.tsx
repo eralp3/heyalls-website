@@ -35,6 +35,15 @@ const projects = [
     desc: 'Sokak modasının dinamik markalarından biri olan Carreas için Shopier altyapısında kapsamlı bir vitrin ve mağaza optimizasyonu yürüttük.',
     reverse: false,
   },
+  {
+    id: 'patron-tour',
+    path: '/calismalarimiz/patron-tour',
+    name: 'Patron Tour Performans Pazarlama',
+    visual: 'Patron Tour',
+    tags: ['Performans Pazarlama', 'Sosyal Medya'],
+    desc: 'Etkileşim odaklı sosyal medya yönetimi ve veri destekli Meta reklam operasyonlarıyla Patron Tour\'un sürdürülebilir dijital büyümesini sağladık.',
+    reverse: true,
+  },
 ]
 
 function RevealRow({ children, delay }: { children: React.ReactNode; delay: number }) {
@@ -81,7 +90,7 @@ export default function Portfolio() {
               <div className={`w-full lg:w-1/2 ${project.reverse ? 'order-2 lg:order-1' : ''}`}>
                 {project.reverse ? (
                   <div className="space-y-6">
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       {project.tags.map((tag) => (
                         <span key={tag} className="text-[10px] uppercase tracking-widest px-3 py-1 border border-white/10 bg-white/5 rounded-full text-white/60">
                           {tag}
@@ -92,10 +101,9 @@ export default function Portfolio() {
                       {project.name}
                     </h2>
                     <p className="text-white/60 text-sm leading-relaxed">{project.desc}</p>
-                    {/* FIX: Now links to its own case study page */}
                     <Link
                       to={project.path}
-                      className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white transition-colors duration-300 mt-2"
+                      className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white transition-colors duration-300"
                     >
                       Vaka Çalışmasını Gör <span className="text-blue-500">→</span>
                     </Link>
@@ -122,7 +130,7 @@ export default function Portfolio() {
                   </Link>
                 ) : (
                   <div className="space-y-6">
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       {project.tags.map((tag) => (
                         <span key={tag} className="text-[10px] uppercase tracking-widest px-3 py-1 border border-white/10 bg-white/5 rounded-full text-white/60">
                           {tag}
@@ -135,7 +143,7 @@ export default function Portfolio() {
                     <p className="text-white/60 text-sm leading-relaxed">{project.desc}</p>
                     <Link
                       to={project.path}
-                      className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white transition-colors duration-300 mt-2"
+                      className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white transition-colors duration-300"
                     >
                       Vaka Çalışmasını Gör <span className="text-blue-500">→</span>
                     </Link>

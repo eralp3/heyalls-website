@@ -191,14 +191,17 @@ export default function Home() {
             </Link>
 
             {/* Patron Tour */}
-            <div className="group relative col-span-1 md:col-span-1 md:row-span-1 rounded-3xl overflow-hidden bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all duration-700 flex flex-col justify-center items-center text-center p-6 min-h-[250px] cursor-default shadow-xl">
-              <div className="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors duration-500" />
-              <div className="relative z-20">
-                <span className="text-[10px] text-white/50 uppercase tracking-widest mb-2 block">Performans Pazarlama</span>
-                <h3 className="text-2xl text-white mb-3" style={displayFont}>Patron Tour</h3>
-                <p className="text-white/40 text-xs leading-relaxed">Etkileşim odaklı sosyal medya yönetimi ve agresif Meta reklam operasyonları.</p>
-              </div>
-            </div>
+     <Link
+  to="/calismalarimiz/patron-tour"
+  className="group relative col-span-1 md:col-span-1 md:row-span-1 rounded-3xl overflow-hidden bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all duration-700 flex flex-col justify-center items-center text-center p-6 min-h-[250px] shadow-xl hover:shadow-2xl"
+>
+  <div className="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors duration-500" />
+  <div className="relative z-20">
+    <span className="text-[10px] text-white/50 uppercase tracking-widest mb-2 block">Performans Pazarlama</span>
+    <h3 className="text-2xl text-white mb-3" style={displayFont}>Patron Tour</h3>
+    <p className="text-white/40 text-xs leading-relaxed">Etkileşim odaklı sosyal medya yönetimi ve agresif Meta reklam operasyonları.</p>
+  </div>
+</Link>
           </div>
         </div>
       </section>

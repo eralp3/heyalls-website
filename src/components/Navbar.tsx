@@ -1,28 +1,56 @@
-import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect, useRef } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { displayFont } from '@/utils/styles'
 
 interface NavbarProps {
   activePage?: 'home' | 'process' | 'services' | 'portfolio'
 }
 
+const navLinks = [
+  { name: 'Ana Sayfa', to: '/', id: 'home' },
+  { name: 'Sürecimiz', to: '/surecimiz', id: 'process' },
+  { name: 'Hizmetlerimiz', to: '/hizmetlerimiz', id: 'services' },
+  { name: 'Çalışmalarımız', to: '/calismalarimiz', id: 'portfolio' },
+]
+
 export default function Navbar({ activePage }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const location = useLocation()
+
+  // ── Animated indicator state ──────────────────────────────────────────────
+  const navRef = useRef<HTMLElement>(null)
+  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, opacity: 0 })
+  const activeRef = useRef<HTMLAnchorElement | null>(null)
+
+  // Determine active link from URL (works even on sub-pages like /calismalarimiz/bimeeting)
+  const activeId = navLinks.find(link =>
+    link.to === '/'
+      ? location.pathname === '/'
+      : location.pathname.startsWith(link.to)
+  )?.id ?? activePage
+
+  // Measure and position the indicator under the active link
+  useEffect(() => {
+    const updateIndicator = () => {
+      if (!activeRef.current || !navRef.current) return
+      const navRect = navRef.current.getBoundingClientRect()
+      const linkRect = activeRef.current.getBoundingClientRect()
+      setIndicatorStyle({
+        left: linkRect.left - navRect.left,
+        width: linkRect.width,
+        opacity: 1,
+      })
+    }
+
+    updateIndicator()
+    window.addEventListener('resize', updateIndicator)
+    return () => window.removeEventListener('resize', updateIndicator)
+  }, [activeId, location.pathname])
 
   useEffect(() => {
-    // FIX: Use '' (empty string) instead of 'unset' to properly restore browser default
     document.body.style.overflow = isOpen ? 'hidden' : ''
-    return () => {
-      document.body.style.overflow = ''
-    }
+    return () => { document.body.style.overflow = '' }
   }, [isOpen])
-
-  const navLinks = [
-    { name: 'Ana Sayfa', to: '/', id: 'home' },
-    { name: 'Sürecimiz', to: '/surecimiz', id: 'process' },
-    { name: 'Hizmetlerimiz', to: '/hizmetlerimiz', id: 'services' },
-    { name: 'Çalışmalarımız', to: '/calismalarimiz', id: 'portfolio' },
-  ]
 
   return (
     <header className="fixed top-0 left-0 z-[9999] w-full bg-[#001a2c]/90 backdrop-blur-lg border-b border-white/5 transition-all duration-300">
@@ -31,19 +59,34 @@ export default function Navbar({ activePage }: NavbarProps) {
           HeyAlls
         </Link>
 
-        {/* Desktop Menu */}
-        <nav className="hidden md:flex flex-row gap-8 items-center">
-          {navLinks.map((link) => (
-            <Link
-              key={link.id}
-              to={link.to}
-              className={`text-sm tracking-wide transition-colors duration-300 ${
-                activePage === link.id ? 'text-white font-medium' : 'text-white/50 hover:text-white'
-              }`}
-            >
-              {link.name}
-            </Link>
-          ))}
+        {/* Desktop nav with sliding indicator */}
+        <nav ref={navRef} className="hidden md:flex flex-row gap-8 items-center relative">
+          {/* Sliding underline indicator */}
+          <span
+            className="absolute bottom-[-6px] h-[1.5px] bg-white rounded-full transition-all duration-300 ease-out"
+            style={{
+              left: indicatorStyle.left,
+              width: indicatorStyle.width,
+              opacity: indicatorStyle.opacity,
+            }}
+          />
+
+          {navLinks.map((link) => {
+            const isActive = activeId === link.id
+            return (
+              <Link
+                key={link.id}
+                to={link.to}
+                ref={isActive ? (el) => { activeRef.current = el } : null}
+                className={`text-sm tracking-wide transition-colors duration-300 pb-1 ${
+                  isActive ? 'text-white' : 'text-white/50 hover:text-white'
+                }`}
+              >
+                {link.name}
+              </Link>
+            )
+          })}
+
           <a
             href="/#intake"
             className="bg-white/10 backdrop-blur-md border border-white/20 text-white px-6 py-2 rounded-full text-sm font-medium transition-all hover:bg-white hover:text-black"
@@ -52,8 +95,7 @@ export default function Navbar({ activePage }: NavbarProps) {
           </a>
         </nav>
 
-        {/* Mobile Hamburger */}
-        {/* FIX: Added aria-expanded to communicate open/close state to screen readers */}
+        {/* Mobile hamburger */}
         <button
           className="md:hidden flex flex-col gap-[5px] p-2 focus:outline-none"
           onClick={() => setIsOpen(!isOpen)}
@@ -67,7 +109,7 @@ export default function Navbar({ activePage }: NavbarProps) {
         </button>
       </div>
 
-      {/* Mobile Full-Screen Menu */}
+      {/* Mobile full-screen menu */}
       <div
         id="mobile-menu"
         role="dialog"
@@ -84,7 +126,7 @@ export default function Navbar({ activePage }: NavbarProps) {
               to={link.to}
               onClick={() => setIsOpen(false)}
               className={`text-4xl font-normal transition-colors duration-300 ${
-                activePage === link.id ? 'text-white' : 'text-white/50'
+                activeId === link.id ? 'text-white' : 'text-white/50'
               }`}
               style={displayFont}
             >

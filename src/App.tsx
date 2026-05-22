@@ -3,6 +3,7 @@ import { useEffect, lazy, Suspense, Component } from 'react'
 import type { ReactNode, ErrorInfo } from 'react'
 import PageTransition from './components/PageTransition'
 import CursorSpotlight from './components/CursorSpotlight'
+import { useAnalytics } from './hooks/useAnalytics'
 
 const Home = lazy(() => import('./pages/Home'))
 const Services = lazy(() => import('./pages/Services'))
@@ -11,6 +12,7 @@ const Portfolio = lazy(() => import('./pages/Portfolio'))
 const Bimeeting = lazy(() => import('./pages/Bimeeting'))
 const Orimo = lazy(() => import('./pages/Orimo'))
 const Carreas = lazy(() => import('./pages/Carreas'))
+const PatronTour = lazy(() => import('./pages/PatronTour'))
 
 interface ErrorBoundaryState { hasError: boolean }
 
@@ -57,6 +59,9 @@ function PageLoader() {
 function AnimatedRoutes() {
   const location = useLocation()
 
+  // Analytics — auto-tracks every page view
+  useAnalytics()
+
   useEffect(() => {
     const loader = document.getElementById('initial-loader')
     if (loader) {
@@ -65,6 +70,22 @@ function AnimatedRoutes() {
         loader.style.visibility = 'hidden'
         setTimeout(() => loader.remove(), 800)
       }, 500)
+    }
+  }, [])
+
+  // Register Service Worker on first load
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker
+          .register('/sw.js')
+          .then(() => {
+            if (import.meta.env.DEV) console.log('[SW] Registered')
+          })
+          .catch((err) => {
+            if (import.meta.env.DEV) console.warn('[SW] Registration failed:', err)
+          })
+      })
     }
   }, [])
 
@@ -77,9 +98,9 @@ function AnimatedRoutes() {
           <Route path="/surecimiz" element={<Process />} />
           <Route path="/calismalarimiz" element={<Portfolio />} />
           <Route path="/calismalarimiz/bimeeting" element={<Bimeeting />} />
-          {/* NEW: Individual case study pages */}
           <Route path="/calismalarimiz/orimo" element={<Orimo />} />
           <Route path="/calismalarimiz/carreas" element={<Carreas />} />
+          <Route path="/calismalarimiz/patron-tour" element={<PatronTour />} />
         </Routes>
       </Suspense>
     </PageTransition>
@@ -90,7 +111,6 @@ function App() {
   return (
     <ErrorBoundary>
       <Router>
-        {/* Desktop cursor spotlight — hidden automatically on touch devices */}
         <CursorSpotlight />
         <AnimatedRoutes />
       </Router>
