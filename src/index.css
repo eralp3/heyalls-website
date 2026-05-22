@@ -33,7 +33,33 @@
   }
 }
 
-/* Premium Liquid Glass Border Effect */
+/* ─── Scroll Reveal ─────────────────────────────────────────────────────────
+   Elements start hidden and transition to visible when useScrollReveal fires.
+   transition-delay is set inline by the hook for staggered effects.
+──────────────────────────────────────────────────────────────────────────── */
+.reveal-hidden {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.65s ease-out, transform 0.65s ease-out;
+}
+
+.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.65s ease-out, transform 0.65s ease-out;
+}
+
+/* Respect user's motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .reveal-hidden,
+  .reveal-visible {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ─── Premium Liquid Glass Border Effect ────────────────────────────────── */
 .liquid-glass {
   background: rgba(255, 255, 255, 0.01);
   background-blend-mode: luminosity;
@@ -65,7 +91,7 @@
   pointer-events: none;
 }
 
-/* Staggered Rise Animations */
+/* ─── Staggered Rise Animations (hero elements) ─────────────────────────── */
 @keyframes fade-rise {
   from {
     opacity: 0;
@@ -85,4 +111,10 @@
 }
 .animate-fade-rise-delay-2 {
   animation: fade-rise 0.8s ease-out 0.4s both;
+}
+
+/* ─── Loading bar (initial loader + PageLoader) ──────────────────────────── */
+@keyframes loading-bar {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
 }

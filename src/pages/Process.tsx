@@ -4,6 +4,33 @@ import VideoBackground from '@/components/VideoBackground'
 import Footer from '@/components/Footer'
 import { displayFont } from '@/utils/styles'
 import { useSEO } from '@/hooks/useSEO'
+import { useScrollReveal } from '@/hooks/useScrollReveal'
+
+const steps = [
+  {
+    step: '01',
+    title: 'Derin Analiz ve Strateji',
+    desc: 'Her şey dinlemekle başlar. Markanızın mevcut darboğazlarını inceler, vizyonunuzu anlar ve en doğru dijital yol haritasını çizeriz.',
+    items: ['Mevcut dijital varlıkların denetimi', 'Sektörel rakip ve pazar analizi', 'Zaman çizelgesi ve bütçe optimizasyon planı'],
+  },
+  {
+    step: '02',
+    title: 'Entegre Geliştirme (In-House)',
+    desc: "Projeyi dışarıya dağıtmak yerine, HeyAlls'un deneyimli ekibi süreci devralır. Web mimarisinden pazarlamaya kadar her şey tek merkezde, uyum içinde üretilir.",
+    items: ['Modern altyapılarla kodlama ve tasarım', 'Kesintisiz ve şeffaf iletişim', 'Dışa bağımlı olmayan, hızlı reaksiyon süreci'],
+  },
+  {
+    step: '03',
+    title: 'Kusursuz İcra ve Lansman',
+    desc: 'Operasyon başladığı andan itibaren tüm süreç denetlenir. Katı kalite kontrol standartlarımızla projenizi yayına alır ve büyütürüz.',
+    items: ['Yayına almadan önce katı performans testleri', 'Anahtar teslim lansman stratejisi', 'Sürekli optimizasyon ve devamlılık desteği'],
+  },
+]
+
+function RevealCard({ children, delay }: { children: React.ReactNode; delay: number }) {
+  const ref = useScrollReveal<HTMLDivElement>({ delay, threshold: 0.12 })
+  return <div ref={ref}>{children}</div>
+}
 
 export default function Process() {
   useSEO(
@@ -11,10 +38,9 @@ export default function Process() {
     'İhtiyacınızı analiz ediyor, projenizi özel ekibimizle tek merkezden uçtan uca geliştiriyor ve yönetiyoruz.'
   )
 
-  // FIX: Added scroll-to-top on mount — was missing unlike Bimeeting page
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
+  useEffect(() => { window.scrollTo(0, 0) }, [])
+
+  const ctaRef = useScrollReveal<HTMLElement>({ delay: 0 })
 
   return (
     <div className="relative min-h-screen w-full bg-[#001a2c] text-white selection:bg-white/20">
@@ -39,49 +65,32 @@ export default function Process() {
       </main>
 
       <section className="relative z-10 max-w-4xl mx-auto px-6 md:px-8 py-16 space-y-12">
-        {[
-          {
-            step: '01',
-            title: 'Derin Analiz ve Strateji',
-            desc: 'Her şey dinlemekle başlar. Markanızın mevcut darboğazlarını inceler, vizyonunuzu anlar ve en doğru dijital yol haritasını çizeriz.',
-            items: ['Mevcut dijital varlıkların denetimi', 'Sektörel rakip ve pazar analizi', 'Zaman çizelgesi ve bütçe optimizasyon planı'],
-          },
-          {
-            step: '02',
-            title: 'Entegre Geliştirme (In-House)',
-            desc: "Projeyi dışarıya dağıtmak yerine, HeyAlls'un deneyimli ekibi süreci devralır. Web mimarisinden pazarlamaya kadar her şey tek merkezde, uyum içinde üretilir.",
-            items: ['Modern altyapılarla kodlama ve tasarım', 'Kesintisiz ve şeffaf iletişim', 'Dışa bağımlı olmayan, hızlı reaksiyon süreci'],
-          },
-          {
-            step: '03',
-            title: 'Kusursuz İcra ve Lansman',
-            desc: 'Operasyon başladığı andan itibaren tüm süreç denetlenir. Katı kalite kontrol standartlarımızla projenizi yayına alır ve büyütürüz.',
-            items: ['Yayına almadan önce katı performans testleri', 'Anahtar teslim lansman stratejisi', 'Sürekli optimizasyon ve devamlılık desteği'],
-          },
-        ].map((card) => (
-          <div key={card.step} className="bg-white/5 backdrop-blur-lg rounded-[2rem] p-8 md:p-10 flex flex-col md:flex-row gap-8 items-start group border border-white/5 hover:border-white/10 hover:bg-white/[0.07] transition-all duration-500 shadow-xl">
-            <div className="w-16 h-16 shrink-0 rounded-full border border-white/20 bg-white/5 text-white flex items-center justify-center text-2xl font-semibold transition-all duration-500 group-hover:bg-white group-hover:text-black group-hover:scale-105">
-              {card.step}
+        {steps.map((card, i) => (
+          <RevealCard key={card.step} delay={i * 100}>
+            <div className="bg-white/5 backdrop-blur-lg rounded-[2rem] p-8 md:p-10 flex flex-col md:flex-row gap-8 items-start group border border-white/5 hover:border-white/10 hover:bg-white/[0.07] transition-all duration-500 shadow-xl">
+              <div className="w-16 h-16 shrink-0 rounded-full border border-white/20 bg-white/5 text-white flex items-center justify-center text-2xl font-semibold transition-all duration-500 group-hover:bg-white group-hover:text-black group-hover:scale-105">
+                {card.step}
+              </div>
+              <div>
+                <h2 className="text-3xl font-normal text-white mb-4 transition-colors duration-300 group-hover:text-blue-400" style={displayFont}>
+                  {card.title}
+                </h2>
+                <p className="text-white/60 text-sm leading-relaxed mb-4">{card.desc}</p>
+                <ul className="text-sm text-white/40 space-y-2">
+                  {card.items.map((item) => (
+                    <li key={item} className="flex items-center gap-2">
+                      <span className="text-blue-400/70 text-xs">▪</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-            <div>
-              <h2 className="text-3xl font-normal text-white mb-4 transition-colors duration-300 group-hover:text-blue-400" style={displayFont}>
-                {card.title}
-              </h2>
-              <p className="text-white/60 text-sm leading-relaxed mb-4">{card.desc}</p>
-              <ul className="text-sm text-white/40 space-y-2">
-                {card.items.map((item) => (
-                  <li key={item} className="flex items-center gap-2">
-                    <span className="text-blue-400/70 text-xs">▪</span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+          </RevealCard>
         ))}
       </section>
 
-      <section className="relative z-10 max-w-4xl mx-auto px-6 py-32 text-center">
+      <section ref={ctaRef} className="relative z-10 max-w-4xl mx-auto px-6 py-32 text-center">
         <h3 className="text-4xl font-normal text-white mb-6" style={displayFont}>Sürecin Bir Parçası Olun.</h3>
         <p className="text-white/50 text-sm mb-8">Kaliteyi korumak adına her dönem yalnızca sınırlı sayıda projeyi kabul ediyoruz.</p>
         <a

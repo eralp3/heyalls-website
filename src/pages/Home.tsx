@@ -1,23 +1,25 @@
-import React, { useState, useRef } from 'react'
+import React, { useRef } from 'react'
 import emailjs from '@emailjs/browser'
 import { Link } from 'react-router-dom'
 import Navbar from '@/components/Navbar'
 import VideoBackground from '@/components/VideoBackground'
 import Footer from '@/components/Footer'
+import StickyMobileCTA from '@/components/StickyMobileCTA'
 import { displayFont } from '@/utils/styles'
 import { useSEO } from '@/hooks/useSEO'
+import { useTilt } from '@/hooks/useTilt'
+import { useScrollReveal } from '@/hooks/useScrollReveal'
+import { useScrollToInput } from '@/hooks/useScrollToInput'
+import { useState } from 'react'
 
-// FIX: Use nullish coalescing instead of `as string` cast.
-// import.meta.env values can be undefined if the .env file is missing a key.
-// Casting directly as string would silently pass "undefined" string to EmailJS.
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID ?? ''
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID ?? ''
 const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY ?? ''
 
 if (import.meta.env.DEV) {
-  if (!EMAILJS_SERVICE_ID) console.warn('[HeyAlls] Missing VITE_EMAILJS_SERVICE_ID in .env')
-  if (!EMAILJS_TEMPLATE_ID) console.warn('[HeyAlls] Missing VITE_EMAILJS_TEMPLATE_ID in .env')
-  if (!EMAILJS_PUBLIC_KEY) console.warn('[HeyAlls] Missing VITE_EMAILJS_PUBLIC_KEY in .env')
+  if (!EMAILJS_SERVICE_ID) console.warn('[HeyAlls] Missing VITE_EMAILJS_SERVICE_ID')
+  if (!EMAILJS_TEMPLATE_ID) console.warn('[HeyAlls] Missing VITE_EMAILJS_TEMPLATE_ID')
+  if (!EMAILJS_PUBLIC_KEY) console.warn('[HeyAlls] Missing VITE_EMAILJS_PUBLIC_KEY')
 }
 
 const services = [
@@ -32,37 +34,26 @@ export default function Home() {
     'Web mimarisinden küresel e-ticarete kadar tüm dijital süreçlerinizi tek merkezden yürüten entegre çözüm merkezi.'
   )
 
-  const [selectedService, setSelectedService] = useState<string | null>(null)
+  // ── Hooks ──────────────────────────────────────────────────────────────────
+  const { handleMouseMove, handleMouseLeave, getTiltStyle } = useTilt()
+
+  // Scroll reveal refs — each section animates in independently
+  const metricsRef = useScrollReveal<HTMLElement>({ delay: 0 })
+  const bentoTitleRef = useScrollReveal<HTMLDivElement>({ delay: 0 })
+  const bentoGridRef = useScrollReveal<HTMLDivElement>({ delay: 100 })
   const formRef = useRef<HTMLFormElement>(null)
+  const commitmentRef = useScrollReveal<HTMLDivElement>({ delay: 0 })
+  const contactCardRef = useScrollReveal<HTMLDivElement>({ delay: 150 })
+
+  // Scroll focused inputs above iOS keyboard
+  useScrollToInput(formRef)
+
+  // ── Form state ─────────────────────────────────────────────────────────────
+  const [selectedService, setSelectedService] = useState<string | null>(null)
   const [isSending, setIsSending] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [isError, setIsError] = useState(false)
   const [serviceError, setServiceError] = useState(false)
-
-  const [tiltStyles, setTiltStyles] = useState<{ [key: string]: string }>({})
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLElement>, id: string) => {
-    const card = e.currentTarget
-    const rect = card.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
-    const centerX = rect.width / 2
-    const centerY = rect.height / 2
-    const tiltAmount = 10
-    const rotateX = ((y - centerY) / centerY) * -tiltAmount
-    const rotateY = ((x - centerX) / centerX) * tiltAmount
-    setTiltStyles(prev => ({
-      ...prev,
-      [id]: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`
-    }))
-  }
-
-  const handleMouseLeave = (id: string) => {
-    setTiltStyles(prev => ({
-      ...prev,
-      [id]: `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`
-    }))
-  }
 
   const sendEmail = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -90,6 +81,9 @@ export default function Home() {
       <VideoBackground overlayOpacity="light" />
       <Navbar activePage="home" />
 
+      {/* Sticky mobile CTA — appears when hero button scrolls out of view */}
+      <StickyMobileCTA />
+
       {/* Hero */}
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-6 pt-32 md:pt-40 pb-24 md:pb-32">
         <div className="inline-block mb-6 px-5 py-2 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm text-xs md:text-sm text-white/80 animate-fade-rise">
@@ -115,8 +109,8 @@ export default function Home() {
         </a>
       </main>
 
-      {/* Güven Sinyalleri & Metrikler */}
-      <section className="relative z-10 w-full max-w-5xl mx-auto px-6 pb-12">
+      {/* Metrics — scroll reveal */}
+      <section ref={metricsRef} className="relative z-10 w-full max-w-5xl mx-auto px-6 pb-12">
         <div className="bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl">
           <div className="text-center md:text-left flex-1">
             <h4 className="text-4xl text-white mb-2" style={displayFont}>3+</h4>
@@ -135,10 +129,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Bento Grid */}
+      {/* Bento Grid — scroll reveal */}
       <section className="relative z-10 w-full pb-20 mt-12">
         <div className="w-full max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-white/10 pb-6">
+          <div ref={bentoTitleRef} className="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-white/10 pb-6">
             <div>
               <span className="text-blue-500 text-xs tracking-widest uppercase mb-2 block font-medium">Seçkin Operasyonlar</span>
               <h2 className="text-4xl md:text-5xl text-white font-normal" style={displayFont}>Çözüm Ortaklarımız</h2>
@@ -148,16 +142,15 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4 md:h-[600px] perspective-1000">
+          <div ref={bentoGridRef} className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4 md:h-[600px]">
 
-            {/* Büyük Kart - Bimeeting */}
+            {/* Bimeeting */}
             <Link
               to="/calismalarimiz/bimeeting"
-              id="bimeeting"
               onMouseMove={(e) => handleMouseMove(e, 'bimeeting')}
               onMouseLeave={() => handleMouseLeave('bimeeting')}
-              style={{ transform: tiltStyles['bimeeting'] || 'perspective(1000px) rotateX(0deg) rotateY(0deg)' }}
-              className="group relative col-span-1 md:col-span-2 md:row-span-2 rounded-3xl overflow-hidden bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all duration-300 ease-out block transform-style-3d shadow-xl hover:shadow-2xl"
+              style={getTiltStyle('bimeeting')}
+              className="group relative col-span-1 md:col-span-2 md:row-span-2 rounded-3xl overflow-hidden bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all duration-300 ease-out block shadow-xl hover:shadow-2xl"
             >
               <div className="absolute inset-0 bg-gradient-to-t from-[#001a2c] via-transparent to-transparent z-10 opacity-80 group-hover:opacity-60 transition-opacity duration-500" />
               <div className="absolute inset-0 bg-blue-500/5 group-hover:bg-blue-500/10 transition-colors duration-500" />
@@ -168,14 +161,13 @@ export default function Home() {
               </div>
             </Link>
 
-            {/* Orta Kart - Orimo Auto */}
+            {/* Orimo Auto */}
             <Link
               to="/calismalarimiz"
-              id="orimo"
               onMouseMove={(e) => handleMouseMove(e, 'orimo')}
               onMouseLeave={() => handleMouseLeave('orimo')}
-              style={{ transform: tiltStyles['orimo'] || 'perspective(1000px) rotateX(0deg) rotateY(0deg)' }}
-              className="group relative col-span-1 md:col-span-2 md:row-span-1 rounded-3xl overflow-hidden bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all duration-300 ease-out block min-h-[250px] transform-style-3d shadow-xl hover:shadow-2xl"
+              style={getTiltStyle('orimo')}
+              className="group relative col-span-1 md:col-span-2 md:row-span-1 rounded-3xl overflow-hidden bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all duration-300 ease-out block min-h-[250px] shadow-xl hover:shadow-2xl"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-[#001a2c] via-transparent to-transparent z-10 opacity-80" />
               <div className="absolute inset-0 bg-purple-500/5 group-hover:bg-purple-500/10 transition-colors duration-500" />
@@ -186,14 +178,13 @@ export default function Home() {
               </div>
             </Link>
 
-            {/* Küçük Kart 1 - Carreas */}
+            {/* Carreas */}
             <Link
               to="/calismalarimiz"
-              id="carreas"
               onMouseMove={(e) => handleMouseMove(e, 'carreas')}
               onMouseLeave={() => handleMouseLeave('carreas')}
-              style={{ transform: tiltStyles['carreas'] || 'perspective(1000px) rotateX(0deg) rotateY(0deg)' }}
-              className="group relative col-span-1 md:col-span-1 md:row-span-1 rounded-3xl overflow-hidden bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all duration-300 ease-out block min-h-[250px] transform-style-3d shadow-xl hover:shadow-2xl"
+              style={getTiltStyle('carreas')}
+              className="group relative col-span-1 md:col-span-1 md:row-span-1 rounded-3xl overflow-hidden bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all duration-300 ease-out block min-h-[250px] shadow-xl hover:shadow-2xl"
             >
               <div className="absolute inset-0 bg-gradient-to-t from-[#001a2c] via-transparent to-transparent z-10 opacity-80" />
               <div className="absolute bottom-0 left-0 p-6 z-20 w-full">
@@ -202,7 +193,7 @@ export default function Home() {
               </div>
             </Link>
 
-            {/* Küçük Kart 2 - Patron Tour */}
+            {/* Patron Tour */}
             <div className="group relative col-span-1 md:col-span-1 md:row-span-1 rounded-3xl overflow-hidden bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all duration-700 flex flex-col justify-center items-center text-center p-6 min-h-[250px] cursor-default shadow-xl">
               <div className="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors duration-500" />
               <div className="relative z-20">
@@ -211,15 +202,14 @@ export default function Home() {
                 <p className="text-white/40 text-xs leading-relaxed">Etkileşim odaklı sosyal medya yönetimi ve agresif Meta reklam operasyonları.</p>
               </div>
             </div>
-
           </div>
         </div>
       </section>
 
-      {/* İletişim Formu */}
+      {/* Contact Form */}
       <section id="intake" className="relative z-10 max-w-4xl mx-auto px-6 md:px-8 py-12 md:py-20">
-        {/* Çalışma Taahhüdü */}
-        <div className="mb-16 bg-white/5 backdrop-blur-lg rounded-[2rem] p-8 md:p-12 border border-white/10 text-center shadow-2xl">
+
+        <div ref={commitmentRef} className="mb-16 bg-white/5 backdrop-blur-lg rounded-[2rem] p-8 md:p-12 border border-white/10 text-center shadow-2xl">
           <p className="text-white/40 text-xs tracking-widest uppercase mb-4">Çalışma Taahhüdümüz</p>
           <p className="text-white/80 text-lg md:text-xl leading-relaxed" style={displayFont}>
             Her proje, lansman öncesi tam kalite denetiminden geçer.
@@ -227,7 +217,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="bg-white/5 backdrop-blur-lg rounded-[2rem] p-6 md:p-14 border border-white/10 shadow-2xl">
+        <div ref={contactCardRef} className="bg-white/5 backdrop-blur-lg rounded-[2rem] p-6 md:p-14 border border-white/10 shadow-2xl">
           <div className="text-center mb-10 md:mb-12">
             <span className="text-xs font-medium uppercase tracking-widest text-white/50 block mb-3 md:mb-4">
               Sisteme Dahil Olun
