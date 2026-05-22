@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import Navbar from '@/components/Navbar'
 import VideoBackground from '@/components/VideoBackground'
 import Footer from '@/components/Footer'
@@ -33,9 +34,14 @@ const projects = [
 
 export default function Portfolio() {
   useSEO(
-    'Başarı Hikayeleri | Portfolyo',
+    'Başarı Hikayeleri | Portfolyo | HeyAlls',
     'HeyAlls ekosistemindeki seçkin uzmanların ve markaların hayata geçirdiği nitelikli projeleri, vaka çalışmalarını inceleyin.'
   )
+
+  // FIX: Added scroll-to-top on mount — was missing unlike Bimeeting page
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   return (
     <div className="relative min-h-screen w-full bg-[#001a2c] text-white selection:bg-white/20">

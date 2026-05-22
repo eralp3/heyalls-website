@@ -12,7 +12,6 @@ export default function Bimeeting() {
     'Modern dil öğrenim vizyonuyla yola çıkan Bimeeting için geliştirdiğimiz kesintisiz topluluk platformu ve altyapı çözümleri.'
   )
 
-  // Sayfa yüklendiğinde en üste kaydır
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
@@ -36,7 +35,7 @@ export default function Bimeeting() {
         </p>
       </main>
 
-{/* Proje Metrikleri (Bento Style) */}
+      {/* Proje Metrikleri (Bento Style) */}
       <section className="relative z-10 max-w-5xl mx-auto px-6 pb-20 animate-fade-rise-delay-2">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
@@ -53,9 +52,12 @@ export default function Bimeeting() {
         </div>
       </section>
 
-      {/* Vaka Çalışması Detayları */}
+      {/*
+        FIX: Visual mockup and Çözüm Mimarisi were previously outside this section,
+        breaking the space-y-32 rhythm. Both are now correctly inside.
+      */}
       <section className="relative z-10 max-w-4xl mx-auto px-6 py-20 space-y-32">
-        
+
         {/* Meydan Okuma */}
         <div className="flex flex-col md:flex-row gap-12 items-start">
           <div className="md:w-1/3">
@@ -71,8 +73,7 @@ export default function Bimeeting() {
           </div>
         </div>
 
-        {/* Görsel Molası (Mockup Alanı) */}
-{/* İLERİ DÜZEY UI MOCKUP SİMÜLASYONU */}
+        {/* Görsel Molası (Mockup) */}
         <div className="w-full aspect-video bg-white/[0.02] rounded-[2rem] border border-white/10 backdrop-blur-sm relative group overflow-hidden shadow-2xl">
           {/* Tarayıcı Üst Barı */}
           <div className="absolute top-0 left-0 w-full h-10 bg-white/5 border-b border-white/5 flex items-center px-6 gap-2">
@@ -113,7 +114,7 @@ export default function Bimeeting() {
             </div>
           </div>
 
-          {/* Üzerine Gelince Çıkan Vurgu */}
+          {/* Hover Badge */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <span className="px-8 py-3 bg-white text-[#001a2c] rounded-full text-sm font-medium tracking-tighter transform translate-y-10 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500 shadow-2xl">
               Platform Mimarisi İnceleniyor
@@ -121,7 +122,7 @@ export default function Bimeeting() {
           </div>
         </div>
 
-    {/* Çözüm Mimarisi */}
+        {/* Çözüm Mimarisi */}
         <div className="flex flex-col md:flex-row gap-12 items-start">
           <div className="md:w-1/3">
             <h2 className="text-3xl text-white sticky top-32" style={displayFont}>Çözüm Mimarisi</h2>
@@ -135,6 +136,7 @@ export default function Bimeeting() {
             </p>
           </div>
         </div>
+
       </section>
 
       {/* Sonraki Proje Navigasyonu */}

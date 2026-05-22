@@ -6,9 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HeyAlls – Uçtan Uca Dijital Çözüm Merkezi</title>
     <meta name="description" content="Web mimarisinden küresel e-ticarete, marka kimliğinden SEO yönetimine kadar tüm süreçleri tek merkezden yürüten entegre dijital altyapı." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://heyalls.com" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
+    <meta property="og:locale" content="tr_TR" />
     <meta property="og:site_name" content="HeyAlls" />
     <meta property="og:url" content="https://heyalls.com" />
     <meta property="og:title" content="HeyAlls | Uçtan Uca Dijital Çözüm Merkezi" />
@@ -23,8 +26,9 @@
     <meta name="twitter:description" content="Web mimarisinden küresel e-ticarete kadar tüm süreçleri tek merkezden yürüten entegre dijital altyapı." />
     <meta name="twitter:image" content="https://heyalls.com/og-image.jpg" />
   </head>
-  <body>
-   <body class="bg-[#001a2c] text-white">
+
+  <!-- FIX: Single <body> tag with Tailwind classes (was duplicated before) -->
+  <body class="bg-[#001a2c] text-white">
     <div id="initial-loader" style="position: fixed; inset: 0; z-index: 99999; background-color: #001a2c; display: flex; align-items: center; justify-content: center; transition: opacity 0.8s ease-in-out, visibility 0.8s ease-in-out;">
       <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
         <span style="font-family: 'Instrument Serif', serif; font-size: 2rem; letter-spacing: 0.1em; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;">HeyAlls</span>
@@ -40,5 +44,4 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
-  </body>
-</html> 
+</html>

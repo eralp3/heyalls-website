@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import Navbar from '@/components/Navbar'
 import VideoBackground from '@/components/VideoBackground'
 import Footer from '@/components/Footer'
@@ -6,9 +7,14 @@ import { useSEO } from '@/hooks/useSEO'
 
 export default function Process() {
   useSEO(
-    'Nasıl Çalışır? | Sürecimiz',
+    'Nasıl Çalışır? | Sürecimiz | HeyAlls',
     'İhtiyacınızı analiz ediyor, projenizi özel ekibimizle tek merkezden uçtan uca geliştiriyor ve yönetiyoruz.'
   )
+
+  // FIX: Added scroll-to-top on mount — was missing unlike Bimeeting page
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   return (
     <div className="relative min-h-screen w-full bg-[#001a2c] text-white selection:bg-white/20">
@@ -43,7 +49,7 @@ export default function Process() {
           {
             step: '02',
             title: 'Entegre Geliştirme (In-House)',
-            desc: 'Projeyi dışarıya dağıtmak yerine, HeyAlls\'un deneyimli ekibi süreci devralır. Web mimarisinden pazarlamaya kadar her şey tek merkezde, uyum içinde üretilir.',
+            desc: "Projeyi dışarıya dağıtmak yerine, HeyAlls'un deneyimli ekibi süreci devralır. Web mimarisinden pazarlamaya kadar her şey tek merkezde, uyum içinde üretilir.",
             items: ['Modern altyapılarla kodlama ve tasarım', 'Kesintisiz ve şeffaf iletişim', 'Dışa bağımlı olmayan, hızlı reaksiyon süreci'],
           },
           {

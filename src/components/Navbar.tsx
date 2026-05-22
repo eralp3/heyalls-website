@@ -10,9 +10,10 @@ export default function Navbar({ activePage }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : 'unset'
+    // FIX: Use '' (empty string) instead of 'unset' to properly restore browser default
+    document.body.style.overflow = isOpen ? 'hidden' : ''
     return () => {
-      document.body.style.overflow = 'unset'
+      document.body.style.overflow = ''
     }
   }, [isOpen])
 
@@ -26,10 +27,11 @@ export default function Navbar({ activePage }: NavbarProps) {
   return (
     <header className="fixed top-0 left-0 z-[9999] w-full bg-[#001a2c]/90 backdrop-blur-lg border-b border-white/5 transition-all duration-300">
       <div className="px-6 md:px-8 py-4 max-w-7xl mx-auto flex flex-row justify-between items-center relative z-[110]">
-<Link to="/" className="text-2xl font-medium text-white flex items-center gap-1" style={displayFont}>
+        <Link to="/" className="text-2xl font-medium text-white flex items-center gap-1" style={displayFont}>
           HeyAlls
         </Link>
-        {/* Masaüstü Menü */}
+
+        {/* Desktop Menu */}
         <nav className="hidden md:flex flex-row gap-8 items-center">
           {navLinks.map((link) => (
             <Link
@@ -49,19 +51,28 @@ export default function Navbar({ activePage }: NavbarProps) {
             Projeyi Başlat
           </a>
         </nav>
-        {/* Mobil Hamburger */}
+
+        {/* Mobile Hamburger */}
+        {/* FIX: Added aria-expanded to communicate open/close state to screen readers */}
         <button
           className="md:hidden flex flex-col gap-[5px] p-2 focus:outline-none"
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Menüyü Aç/Kapat"
+          aria-expanded={isOpen}
+          aria-controls="mobile-menu"
         >
           <div className={`w-6 h-[2px] bg-white transition-all duration-300 origin-left ${isOpen ? 'rotate-45 translate-x-[2px] -translate-y-[1px]' : ''}`} />
           <div className={`w-6 h-[2px] bg-white transition-all duration-300 ${isOpen ? 'opacity-0 translate-x-4' : ''}`} />
           <div className={`w-6 h-[2px] bg-white transition-all duration-300 origin-left ${isOpen ? '-rotate-45 translate-x-[2px] translate-y-[1px]' : ''}`} />
         </button>
       </div>
-      {/* Mobil Tam Ekran Menü */}
+
+      {/* Mobile Full-Screen Menu */}
       <div
+        id="mobile-menu"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Navigasyon Menüsü"
         className={`fixed inset-0 min-h-screen bg-[#001a2c]/95 backdrop-blur-xl z-[105] flex flex-col items-center justify-center gap-10 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] md:hidden ${
           isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'
         }`}

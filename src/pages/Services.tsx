@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import Navbar from '@/components/Navbar'
 import VideoBackground from '@/components/VideoBackground'
 import Footer from '@/components/Footer'
@@ -6,9 +7,14 @@ import { useSEO } from '@/hooks/useSEO'
 
 export default function Services() {
   useSEO(
-    'Hizmetlerimiz | Uçtan Uca Dijital Çözümler',
+    'Hizmetlerimiz | Uçtan Uca Dijital Çözümler | HeyAlls',
     'Web geliştirme, kurumsal web tasarım, e-ticaret sitesi, SEO yönetimi ve dijital pazarlama alanlarında entegre in-house hizmetlerimiz.'
   )
+
+  // FIX: Added scroll-to-top on mount for consistency across all pages
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   const marqueeItems = [
     'SEO YÖNETİMİ', 'TANITIM WEB SİTESİ', 'E-TİCARET SİTESİ',
