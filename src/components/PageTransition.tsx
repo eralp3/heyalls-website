@@ -2,15 +2,14 @@ import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
 /**
- * Wraps page content in a fade transition that fires on every route change.
- * Uses CSS only — no Framer Motion dependency needed.
+ * FIX: Removed translateY transform from the wrapper.
+ * Any CSS transform on a parent creates a new stacking context,
+ * which breaks position:fixed children (VideoBackground) — they
+ * start positioning relative to the transformed div instead of
+ * the viewport, making the video appear zoomed/shifted.
  *
- * Usage: wrap the content inside each page's root div, or wrap <Routes> in App.tsx.
- *
- * Place this INSIDE your page component's return, wrapping the content:
- *   <PageTransition>
- *     <div>...page content...</div>
- *   </PageTransition>
+ * Solution: animate opacity only. The fade still feels smooth
+ * and the video background is unaffected.
  */
 export default function PageTransition({ children }: { children: React.ReactNode }) {
   const location = useLocation()
@@ -20,11 +19,9 @@ export default function PageTransition({ children }: { children: React.ReactNode
   useEffect(() => {
     if (location.key === displayKey) return
 
-    // Fade out
     setPhase('out')
     const t1 = setTimeout(() => {
       setDisplayKey(location.key)
-      // Fade in
       setPhase('in')
     }, 180)
 
@@ -35,8 +32,8 @@ export default function PageTransition({ children }: { children: React.ReactNode
     <div
       style={{
         opacity: phase === 'in' ? 1 : 0,
-        transform: phase === 'in' ? 'translateY(0)' : 'translateY(8px)',
-        transition: 'opacity 0.22s ease-out, transform 0.22s ease-out',
+        // NO transform here — transform breaks fixed positioning of VideoBackground
+        transition: 'opacity 0.22s ease-out',
       }}
     >
       {children}
