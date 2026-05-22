@@ -72,9 +72,53 @@ export default function Bimeeting() {
         </div>
 
         {/* Görsel Molası (Mockup Alanı) */}
-        <div className="w-full aspect-video bg-gradient-to-br from-white/5 to-white/[0.01] rounded-[2rem] border border-white/10 backdrop-blur-sm flex items-center justify-center overflow-hidden relative group">
-          <div className="absolute inset-0 bg-[#001a2c]/50 group-hover:bg-transparent transition-colors duration-700" />
-          <span className="text-white/20 text-2xl tracking-widest uppercase font-light" style={displayFont}>Platform Arayüzü</span>
+{/* İLERİ DÜZEY UI MOCKUP SİMÜLASYONU */}
+        <div className="w-full aspect-video bg-white/[0.02] rounded-[2rem] border border-white/10 backdrop-blur-sm relative group overflow-hidden shadow-2xl">
+          {/* Tarayıcı Üst Barı */}
+          <div className="absolute top-0 left-0 w-full h-10 bg-white/5 border-b border-white/5 flex items-center px-6 gap-2">
+            <div className="w-2.5 h-2.5 rounded-full bg-red-500/40" />
+            <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/40" />
+            <div className="w-2.5 h-2.5 rounded-full bg-green-500/40" />
+            <div className="ml-4 h-4 w-40 bg-white/5 rounded-full" />
+          </div>
+
+          {/* Simüle Edilmiş Dashboard İçeriği */}
+          <div className="pt-16 px-8 grid grid-cols-12 gap-6 h-full opacity-40 group-hover:opacity-100 transition-opacity duration-700">
+            {/* Sidebar Simülasyonu */}
+            <div className="col-span-3 space-y-4">
+              <div className="h-8 w-full bg-white/10 rounded-lg animate-pulse" />
+              <div className="h-4 w-3/4 bg-white/5 rounded-full" />
+              <div className="h-4 w-1/2 bg-white/5 rounded-full" />
+              <div className="h-4 w-2/3 bg-white/5 rounded-full" />
+              <div className="pt-8 space-y-3">
+                <div className="h-20 w-full bg-blue-500/10 rounded-xl border border-blue-500/10" />
+              </div>
+            </div>
+            {/* Main Content Simülasyonu */}
+            <div className="col-span-9 space-y-6">
+              <div className="flex justify-between items-center">
+                <div className="h-10 w-48 bg-white/10 rounded-xl" />
+                <div className="h-10 w-10 bg-blue-500/20 rounded-full" />
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="h-32 bg-white/[0.03] rounded-2xl border border-white/5" />
+                <div className="h-32 bg-white/[0.03] rounded-2xl border border-white/5" />
+                <div className="h-32 bg-white/[0.03] rounded-2xl border border-white/5" />
+              </div>
+              <div className="h-48 w-full bg-gradient-to-br from-white/5 to-transparent rounded-3xl border border-white/5 p-6">
+                <div className="h-2 w-full bg-white/5 rounded-full mb-4" />
+                <div className="h-2 w-3/4 bg-white/5 rounded-full mb-4" />
+                <div className="h-2 w-1/2 bg-white/5 rounded-full" />
+              </div>
+            </div>
+          </div>
+
+          {/* Üzerine Gelince Çıkan Vurgu */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <span className="px-8 py-3 bg-white text-[#001a2c] rounded-full text-sm font-medium tracking-tighter transform translate-y-10 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500 shadow-2xl">
+              Platform Mimarisi İnceleniyor
+            </span>
+          </div>
         </div>
 
         {/* Çözüm Mimarisi */}
