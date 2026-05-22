@@ -36,14 +36,14 @@ export default function Bimeeting() {
         </p>
       </main>
 
-      {/* Proje Metrikleri (Bento Style) */}
+{/* Proje Metrikleri (Bento Style) */}
       <section className="relative z-10 max-w-5xl mx-auto px-6 pb-20 animate-fade-rise-delay-2">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: 'Hizmet', value: 'Platform Mimari' },
-            { label: 'Teknoloji', value: 'WP & Özel CMS' },
-            { label: 'Süreç', value: 'Uçtan Uca' },
-            { label: 'Sonuç', value: 'Kesintisiz Akış' }
+            { label: 'Hizmet', value: 'Web App & Platform' },
+            { label: 'Teknoloji', value: 'Custom JS & Firebase' },
+            { label: 'Veritabanı', value: 'Real-time NoSQL' },
+            { label: 'Sonuç', value: 'Sıfır Gecikme' }
           ].map((stat, idx) => (
             <div key={idx} className="bg-white/[0.03] backdrop-blur-md border border-white/5 rounded-2xl p-6 text-center">
               <span className="block text-white/40 text-[10px] uppercase tracking-widest mb-2">{stat.label}</span>
@@ -121,17 +121,17 @@ export default function Bimeeting() {
           </div>
         </div>
 
-        {/* Çözüm Mimarisi */}
+    {/* Çözüm Mimarisi */}
         <div className="flex flex-col md:flex-row gap-12 items-start">
           <div className="md:w-1/3">
             <h2 className="text-3xl text-white sticky top-32" style={displayFont}>Çözüm Mimarisi</h2>
           </div>
           <div className="md:w-2/3 space-y-6 text-white/70 leading-relaxed font-light">
             <p>
-              HeyAlls olarak projeyi dışarıdan hazır paketlerle çözmek yerine, markanın ruhuna uygun özel bir altyapı kodladık. WordPress ve özel tema mimarilerini harmanlayarak, içerik yönetimini (CMS) son derece esnek bir hale getirdik.
+              Projenin hız ve anlık etkileşim gereksinimlerini karşılamak için hantal hazır paketler yerine tamamen özel bir kod mimarisi (custom development) inşa ettik.
             </p>
             <p>
-              Kullanıcı deneyimini (UX) merkeze alarak, karmaşık kayıt ve katılım süreçlerini tek tıkla çözülebilir, "sıvı" bir akışa dönüştürdük. Eş zamanlı olarak sosyal medyadaki tüm topluluk kampanyalarını bu mimariyle senkronize ettik.
+              Topluluğun mesajlaşma, canlı katılım ve veri senkronizasyonu gibi süreçlerini sıfır gecikmeyle (real-time) yönetmek adına arka planda <strong>Firebase</strong> altyapısını konumlandırdık. Bu sayede platform; güvenli kimlik doğrulama, dinamik veri tabanı yönetimi ve yüksek trafik anlarında bile çökmeden esneyebilen (scalable) kusursuz bir Web Uygulamasına dönüştü.
             </p>
           </div>
         </div>
