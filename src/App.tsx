@@ -1,20 +1,18 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { useEffect } from 'react' // Bunu eklemeyi unutma
+import { useEffect } from 'react'
 import Home from './pages/Home'
 import Services from './pages/Services'
 import Process from './pages/Process'
 import Portfolio from './pages/Portfolio'
+import Bimeeting from './pages/Bimeeting' // YENİ EKLENDİ
 
 function App() {
-  // Yükleme ekranını kaldırma mantığı
   useEffect(() => {
     const loader = document.getElementById('initial-loader')
     if (loader) {
-      // Fontların ve kritik bileşenlerin oturması için ufak bir gecikme
       setTimeout(() => {
         loader.style.opacity = '0'
         loader.style.visibility = 'hidden'
-        // Animasyon bittikten sonra DOM'dan tamamen temizle
         setTimeout(() => {
           loader.remove()
         }, 800)
@@ -29,6 +27,7 @@ function App() {
         <Route path="/hizmetlerimiz" element={<Services />} />
         <Route path="/surecimiz" element={<Process />} />
         <Route path="/calismalarimiz" element={<Portfolio />} />
+        <Route path="/calismalarimiz/bimeeting" element={<Bimeeting />} /> {/* YENİ EKLENDİ */}
       </Routes>
     </Router>
   )

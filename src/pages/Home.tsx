@@ -148,7 +148,7 @@ export default function Home() {
             
             {/* Büyük Kart - Bimeeting */}
             <Link 
-              to="/calismalarimiz" 
+              to="/calismalarimiz/bimeeting"
               id="bimeeting"
               onMouseMove={(e) => handleMouseMove(e, 'bimeeting')}
               onMouseLeave={() => handleMouseLeave('bimeeting')}
