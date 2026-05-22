@@ -2,12 +2,15 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { useEffect, lazy, Suspense, Component } from 'react'
 import type { ReactNode, ErrorInfo } from 'react'
 import PageTransition from './components/PageTransition'
+import CursorSpotlight from './components/CursorSpotlight'
 
 const Home = lazy(() => import('./pages/Home'))
 const Services = lazy(() => import('./pages/Services'))
 const Process = lazy(() => import('./pages/Process'))
 const Portfolio = lazy(() => import('./pages/Portfolio'))
 const Bimeeting = lazy(() => import('./pages/Bimeeting'))
+const Orimo = lazy(() => import('./pages/Orimo'))
+const Carreas = lazy(() => import('./pages/Carreas'))
 
 interface ErrorBoundaryState { hasError: boolean }
 
@@ -51,7 +54,6 @@ function PageLoader() {
   )
 }
 
-// Inner component so useLocation works (must be inside <Router>)
 function AnimatedRoutes() {
   const location = useLocation()
 
@@ -67,7 +69,6 @@ function AnimatedRoutes() {
   }, [])
 
   return (
-    // PageTransition wraps all routes — fades on every navigation
     <PageTransition key={location.pathname}>
       <Suspense fallback={<PageLoader />}>
         <Routes location={location}>
@@ -76,6 +77,9 @@ function AnimatedRoutes() {
           <Route path="/surecimiz" element={<Process />} />
           <Route path="/calismalarimiz" element={<Portfolio />} />
           <Route path="/calismalarimiz/bimeeting" element={<Bimeeting />} />
+          {/* NEW: Individual case study pages */}
+          <Route path="/calismalarimiz/orimo" element={<Orimo />} />
+          <Route path="/calismalarimiz/carreas" element={<Carreas />} />
         </Routes>
       </Suspense>
     </PageTransition>
@@ -86,6 +90,8 @@ function App() {
   return (
     <ErrorBoundary>
       <Router>
+        {/* Desktop cursor spotlight — hidden automatically on touch devices */}
+        <CursorSpotlight />
         <AnimatedRoutes />
       </Router>
     </ErrorBoundary>

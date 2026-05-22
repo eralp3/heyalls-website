@@ -1,0 +1,33 @@
+{
+  "name": "HeyAlls – Dijital Çözüm Merkezi",
+  "short_name": "HeyAlls",
+  "description": "Web mimarisinden küresel e-ticarete kadar tüm dijital süreçlerinizi tek merkezden yürüten entegre çözüm merkezi.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#001a2c",
+  "theme_color": "#001a2c",
+  "orientation": "portrait-primary",
+  "lang": "tr",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/og-image.jpg",
+      "sizes": "1200x630",
+      "type": "image/jpeg",
+      "label": "HeyAlls Ana Sayfa"
+    }
+  ]
+}

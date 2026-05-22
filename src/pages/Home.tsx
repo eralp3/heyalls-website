@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import emailjs from '@emailjs/browser'
 import { Link } from 'react-router-dom'
 import Navbar from '@/components/Navbar'
@@ -10,7 +10,7 @@ import { useSEO } from '@/hooks/useSEO'
 import { useTilt } from '@/hooks/useTilt'
 import { useScrollReveal } from '@/hooks/useScrollReveal'
 import { useScrollToInput } from '@/hooks/useScrollToInput'
-import { useState } from 'react'
+import { useToast, ToastContainer } from '@/hooks/useToast'
 
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID ?? ''
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID ?? ''
@@ -34,45 +34,41 @@ export default function Home() {
     'Web mimarisinden küresel e-ticarete kadar tüm dijital süreçlerinizi tek merkezden yürüten entegre çözüm merkezi.'
   )
 
-  // ── Hooks ──────────────────────────────────────────────────────────────────
   const { handleMouseMove, handleMouseLeave, getTiltStyle } = useTilt()
+  const { toasts, showToast, removeToast } = useToast()
 
-  // Scroll reveal refs — each section animates in independently
   const metricsRef = useScrollReveal<HTMLElement>({ delay: 0 })
   const bentoTitleRef = useScrollReveal<HTMLDivElement>({ delay: 0 })
   const bentoGridRef = useScrollReveal<HTMLDivElement>({ delay: 100 })
-  const formRef = useRef<HTMLFormElement>(null)
   const commitmentRef = useScrollReveal<HTMLDivElement>({ delay: 0 })
   const contactCardRef = useScrollReveal<HTMLDivElement>({ delay: 150 })
 
-  // Scroll focused inputs above iOS keyboard
+  const formRef = useRef<HTMLFormElement>(null)
   useScrollToInput(formRef)
 
-  // ── Form state ─────────────────────────────────────────────────────────────
   const [selectedService, setSelectedService] = useState<string | null>(null)
   const [isSending, setIsSending] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false)
-  const [isError, setIsError] = useState(false)
   const [serviceError, setServiceError] = useState(false)
 
   const sendEmail = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!selectedService) { setServiceError(true); return }
-    setServiceError(false); setIsSending(true); setIsError(false)
+    setServiceError(false)
+    setIsSending(true)
 
     emailjs
       .sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, formRef.current!, EMAILJS_PUBLIC_KEY)
       .then(() => {
-        setIsSuccess(true)
         setIsSending(false)
-        setTimeout(() => setIsSuccess(false), 5000)
         if (formRef.current) formRef.current.reset()
         setSelectedService(null)
+        // FIX: Toast replaces the inline success message — far more visible
+        showToast('Talebiniz başarıyla alındı. En kısa sürede dönüş yapılacaktır.', 'success')
       })
       .catch((err: unknown) => {
         if (import.meta.env.DEV) console.error('EmailJS Hatası:', err)
-        setIsError(true)
         setIsSending(false)
+        showToast('Bir hata oluştu. Lütfen tekrar deneyin.', 'error')
       })
   }
 
@@ -80,9 +76,10 @@ export default function Home() {
     <div className="relative min-h-screen w-full bg-[#001a2c] text-white selection:bg-white/20">
       <VideoBackground overlayOpacity="light" />
       <Navbar activePage="home" />
-
-      {/* Sticky mobile CTA — appears when hero button scrolls out of view */}
       <StickyMobileCTA />
+
+      {/* Toast notifications — renders at top of screen */}
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
 
       {/* Hero */}
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-6 pt-32 md:pt-40 pb-24 md:pb-32">
@@ -109,7 +106,7 @@ export default function Home() {
         </a>
       </main>
 
-      {/* Metrics — scroll reveal */}
+      {/* Metrics */}
       <section ref={metricsRef} className="relative z-10 w-full max-w-5xl mx-auto px-6 pb-12">
         <div className="bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl">
           <div className="text-center md:text-left flex-1">
@@ -129,7 +126,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Bento Grid — scroll reveal */}
+      {/* Bento Grid */}
       <section className="relative z-10 w-full pb-20 mt-12">
         <div className="w-full max-w-7xl mx-auto px-6">
           <div ref={bentoTitleRef} className="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-white/10 pb-6">
@@ -161,9 +158,9 @@ export default function Home() {
               </div>
             </Link>
 
-            {/* Orimo Auto */}
+            {/* Orimo Auto — now links to case study */}
             <Link
-              to="/calismalarimiz"
+              to="/calismalarimiz/orimo"
               onMouseMove={(e) => handleMouseMove(e, 'orimo')}
               onMouseLeave={() => handleMouseLeave('orimo')}
               style={getTiltStyle('orimo')}
@@ -178,9 +175,9 @@ export default function Home() {
               </div>
             </Link>
 
-            {/* Carreas */}
+            {/* Carreas — now links to case study */}
             <Link
-              to="/calismalarimiz"
+              to="/calismalarimiz/carreas"
               onMouseMove={(e) => handleMouseMove(e, 'carreas')}
               onMouseLeave={() => handleMouseLeave('carreas')}
               style={getTiltStyle('carreas')}
@@ -208,7 +205,6 @@ export default function Home() {
 
       {/* Contact Form */}
       <section id="intake" className="relative z-10 max-w-4xl mx-auto px-6 md:px-8 py-12 md:py-20">
-
         <div ref={commitmentRef} className="mb-16 bg-white/5 backdrop-blur-lg rounded-[2rem] p-8 md:p-12 border border-white/10 text-center shadow-2xl">
           <p className="text-white/40 text-xs tracking-widest uppercase mb-4">Çalışma Taahhüdümüz</p>
           <p className="text-white/80 text-lg md:text-xl leading-relaxed" style={displayFont}>
@@ -230,7 +226,7 @@ export default function Home() {
             </p>
           </div>
 
-          <form ref={formRef} onSubmit={sendEmail} onChange={() => setIsError(false)} className="space-y-8">
+          <form ref={formRef} onSubmit={sendEmail} className="space-y-8">
             <input
               type="hidden"
               name="selected_service"
@@ -305,7 +301,7 @@ export default function Home() {
               />
             </div>
 
-            <div className="pt-8 text-center flex flex-col items-center">
+            <div className="pt-8 text-center">
               <button
                 type="submit"
                 disabled={isSending}
@@ -315,16 +311,6 @@ export default function Home() {
               >
                 {isSending ? 'Gönderiliyor...' : 'Talebi Gönder'}
               </button>
-              {isSuccess && (
-                <p className="text-green-400 mt-4 text-sm animate-fade-rise">
-                  Talebiniz başarıyla alındı. En kısa sürede dönüş yapılacaktır.
-                </p>
-              )}
-              {isError && (
-                <p className="text-red-400 mt-4 text-sm animate-fade-rise">
-                  Bir hata oluştu. Lütfen tekrar deneyin.
-                </p>
-              )}
             </div>
           </form>
         </div>

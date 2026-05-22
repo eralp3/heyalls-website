@@ -4,10 +4,32 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HeyAlls – Uçtan Uca Dijital Çözüm Merkezi</title>
-    <meta name="description" content="Web mimarisinden küresel e-ticarete, marka kimliğinden SEO yönetimine kadar tüm süreçleri tek merkezden yürüten entegre dijital altyapı." />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://heyalls.com" />
+
+    <!-- PWA manifest — enables "Add to Home Screen" on iOS and Android -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#001a2c" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="HeyAlls" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Font preload — eliminates FOUT on the hero heading -->
+    <link
+      rel="preload"
+      href="https://fonts.gstatic.com/s/instrumentserif/v1/Qw3EZQNVHBtFKA4HLgAHMhM5azmMkL0.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <!-- Load fonts normally as fallback for other weights/variants -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+
+    <title>HeyAlls – Uçtan Uca Dijital Çözüm Merkezi</title>
+    <meta name="description" content="Web mimarisinden küresel e-ticarete, marka kimliğinden SEO yönetimine kadar tüm süreçleri tek merkezden yürüten entegre dijital altyapı." />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -27,7 +49,6 @@
     <meta name="twitter:image" content="https://heyalls.com/og-image.jpg" />
   </head>
 
-  <!-- FIX: Single <body> tag with Tailwind classes (was duplicated before) -->
   <body class="bg-[#001a2c] text-white">
     <div id="initial-loader" style="position: fixed; inset: 0; z-index: 99999; background-color: #001a2c; display: flex; align-items: center; justify-content: center; transition: opacity 0.8s ease-in-out, visibility 0.8s ease-in-out;">
       <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
