@@ -1,6 +1,8 @@
-// HeyAlls Service Worker
-// Strategy: Cache First for static assets, Network First for pages
-const CACHE_NAME = 'heyalls-v1'
+// HeyAlls Service Worker — v2
+// Strategy: Cache First for static assets, Network First for pages,
+// SKIP entirely for video files (too large + browser streams them natively).
+
+const CACHE_NAME = 'heyalls-v2'
 
 const STATIC_ASSETS = [
   '/',
@@ -9,7 +11,6 @@ const STATIC_ASSETS = [
   '/manifest.json',
 ]
 
-// Install — pre-cache critical static assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
@@ -17,7 +18,6 @@ self.addEventListener('install', (event) => {
   self.skipWaiting()
 })
 
-// Activate — delete old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
@@ -27,19 +27,27 @@ self.addEventListener('activate', (event) => {
   self.clients.claim()
 })
 
-// Fetch — Cache First for assets, Network First for navigation
 self.addEventListener('fetch', (event) => {
   const { request } = event
   const url = new URL(request.url)
 
-  // Skip non-GET and cross-origin requests
   if (request.method !== 'GET' || url.origin !== location.origin) return
 
-  // Cache First: images, fonts, videos, JS/CSS bundles
+  // FIX: Skip video entirely — let the browser handle streaming natively.
+  // Caching/intercepting video can break Range requests and prevent playback.
+  if (
+    request.destination === 'video' ||
+    url.pathname.endsWith('.mp4') ||
+    url.pathname.endsWith('.webm') ||
+    url.pathname.endsWith('.mov')
+  ) {
+    return // Falls through to default browser behavior
+  }
+
+  // Cache First: images, fonts, JS, CSS
   if (
     request.destination === 'image' ||
     request.destination === 'font' ||
-    request.destination === 'video' ||
     request.destination === 'script' ||
     request.destination === 'style'
   ) {
@@ -58,7 +66,7 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // Network First: HTML pages — always try network, fall back to cache
+  // Network First: HTML pages
   if (request.destination === 'document' || request.mode === 'navigate') {
     event.respondWith(
       fetch(request)
