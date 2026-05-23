@@ -8,13 +8,11 @@ export default function VideoBackground({ overlayOpacity = 'light' }: VideoBackg
   return (
     <div className="fixed inset-0 w-full h-full z-0 overflow-hidden bg-[#001a2c]">
       <video
+        id="bg-video"           // ← ADDED: needed for the WebGL refraction shader
         autoPlay
         loop
         muted
         playsInline
-        // FIX: Changed from preload="auto" to preload="none"
-        // preload="auto" forced the full video to download on every page load,
-        // killing mobile performance. The poster shows instantly while the video loads lazily.
         preload="none"
         poster="/bg-poster.webp"
         className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none"

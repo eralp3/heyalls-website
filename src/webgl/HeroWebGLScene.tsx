@@ -1,24 +1,44 @@
 import { useEffect, useRef } from 'react'
 
 /**
- * HeroWebGLScene — Ecosystem Network (v2)
+ * HeroWebGLScene — Sea Surface Distortion / Refraction
  * ────────────────────────────────────────────────────────────────────────────
- * Visualizes HeyAlls as a structured ecosystem, not a generic particle field.
+ * A full-screen water surface shader that refracts the existing background
+ * video through animated noise + cursor-driven ripples.
  *
- * Improvements over v1:
- *   • Clustered topology: 4 service clusters around 1 central hub node
- *   • Node hierarchy: hub > primary > peripheral (different sizes)
- *   • Color-graded connections (warm core → cool edge)
- *   • Stronger, more responsive cursor attraction
- *   • Document-level cursor tracking (reliable across elements)
+ * Conceptual mapping for HeyAlls:
+ *   The video (your brand atmosphere) is now a living medium. The user's
+ *   cursor creates ripples on its surface — the system responds to attention.
+ *
+ * Architecture:
+ *   • Single fullscreen quad (THREE.PlaneGeometry(2,2)) on an OrthographicCamera
+ *   • THREE.VideoTexture sourced from <video id="bg-video"> (must exist in DOM)
+ *   • Custom fragment shader: simplex noise + ripple field → UV distortion
+ *   • No render targets, no post-processing — single draw call per frame
+ *
+ * Performance:
+ *   • One draw call. Costs roughly the same as drawing the video itself.
+ *   • Pauses entirely when offscreen (IntersectionObserver) or tab hidden.
+ *   • Ripple buffer capped at MAX_RIPPLES (5) to keep shader uniform array tiny.
+ *
+ * Required DOM contract:
+ *   The fixed background <video> element MUST have id="bg-video".
+ *   See VideoBackground.tsx patch below.
  */
 
-const HUB_COUNT = 1            // central HeyAlls node
-const CLUSTER_COUNT = 4        // service clusters (web, e-commerce, marketing, content)
-const NODES_PER_CLUSTER = 7    // nodes in each cluster
-const TOTAL_NODES = HUB_COUNT + CLUSTER_COUNT * NODES_PER_CLUSTER  // 29
+// ─── TUNING (top of file so you can taste-test in one place) ────────────────
+const TINT_COLOR           = { r: 0.00, g: 0.10, b: 0.17 } // #001a2c — your brand navy
+const TINT_STRENGTH        = 0.45    // 0 = no tint, 1 = solid navy
+const NOISE_AMPLITUDE      = 0.018   // how strong the ambient ocean wobble is
+const NOISE_SCALE          = 2.2     // higher = smaller, more chaotic waves
+const NOISE_SPEED          = 0.18    // ambient flow speed
+const RIPPLE_AMPLITUDE     = 0.045   // how strong cursor ripples push the UVs
+const RIPPLE_SPEED         = 1.6     // how fast ripples expand outward
+const RIPPLE_LIFE          = 1.8     // seconds before a ripple fades to nothing
+const RIPPLE_SPAWN_DIST    = 0.04    // min cursor travel (NDC) before a new ripple
+const SCROLL_FADE_END      = 800
 
-const CONNECTION_DISTANCE = 3.2
+const MAX_RIPPLES = 5  // matches GLSL array size below — keep in sync
 
 export default function HeroWebGLScene() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -36,276 +56,284 @@ export default function HeroWebGLScene() {
       if (cancelled || !containerRef.current) return
       const container = containerRef.current
 
+      // ── Locate the background video element ─────────────────────────────
+      const videoEl = document.getElementById('bg-video') as HTMLVideoElement | null
+      if (!videoEl) {
+        console.warn('[HeroWebGLScene] No <video id="bg-video"> found — refraction disabled')
+        return
+      }
+
+      // Ensure the video is playing inline + muted (required for autoplay on iOS)
+      videoEl.muted = true
+      videoEl.playsInline = true
+      // Best-effort kick: if browser paused it, try again silently
+      videoEl.play().catch(() => { /* ignore — autoplay policy */ })
+
       // ── Renderer ────────────────────────────────────────────────────────
       const renderer = new THREE.WebGLRenderer({
         alpha: true,
-        antialias: true,
+        antialias: false, // shader does its own AA via smoothstep
         powerPreference: 'high-performance',
       })
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5))
-      renderer.setSize(container.clientWidth, container.clientHeight)
+      renderer.setSize(window.innerWidth, window.innerHeight)
       renderer.setClearColor(0x000000, 0)
       container.appendChild(renderer.domElement)
 
-      // ── Scene + Camera ──────────────────────────────────────────────────
+      // ── Scene + Camera (orthographic, fills viewport with one quad) ─────
       const scene = new THREE.Scene()
-      const camera = new THREE.PerspectiveCamera(
-        50,
-        container.clientWidth / container.clientHeight,
-        0.1,
-        100
-      )
-      camera.position.set(0, 0, 14)
-      camera.lookAt(0, 0, 0)
+      const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -1, 1)
 
-      // ── Generate structured node positions ─────────────────────────────
-      // Hub at center, clusters arranged around it on a ring
-      const initialPositions: { x: number; y: number; z: number; radius: number }[] = []
-      const nodeSizes: number[] = []
-      const nodeTypes: ('hub' | 'primary' | 'peripheral')[] = []
+      // ── Video texture ───────────────────────────────────────────────────
+      const videoTexture = new THREE.VideoTexture(videoEl)
+      videoTexture.minFilter = THREE.LinearFilter
+      videoTexture.magFilter = THREE.LinearFilter
+      // colorSpace setting for correct gamma — use SRGB if available
+      // (newer Three.js versions; safe to set as it just hints color management)
+      ;(videoTexture as unknown as { colorSpace?: string }).colorSpace = THREE.SRGBColorSpace
 
-      // 1. Central hub
-      initialPositions.push({ x: 0, y: 0, z: 0, radius: 0.4 })
-      nodeSizes.push(0.55)
-      nodeTypes.push('hub')
+      // ── Ripple state (5 active ripples, x/y/birthTime per ripple) ──────
+      // Pre-flat-packed arrays we'll write to uniforms each frame.
+      const ripplePositions = new Float32Array(MAX_RIPPLES * 2) // x, y in normalized [0,1]
+      const rippleAges      = new Float32Array(MAX_RIPPLES)     // age in seconds
+      const rippleActive    = new Uint8Array(MAX_RIPPLES)       // 1 = active
 
-      // 2. Clusters arranged in a ring around the hub
-      const clusterRadius = 5.5
-      for (let c = 0; c < CLUSTER_COUNT; c++) {
-        const angle = (c / CLUSTER_COUNT) * Math.PI * 2
-        const clusterCenterX = Math.cos(angle) * clusterRadius
-        const clusterCenterY = Math.sin(angle) * clusterRadius
-        const clusterCenterZ = (Math.random() - 0.5) * 1.5
-
-        // First node of cluster = primary (larger, sits at cluster center)
-        initialPositions.push({
-          x: clusterCenterX,
-          y: clusterCenterY,
-          z: clusterCenterZ,
-          radius: 0.35,
-        })
-        nodeSizes.push(0.32)
-        nodeTypes.push('primary')
-
-        // Remaining nodes = peripheral, scattered around the primary
-        for (let n = 1; n < NODES_PER_CLUSTER; n++) {
-          const localR = 1.2 + Math.random() * 1.4
-          const localAngle = Math.random() * Math.PI * 2
-          const localPhi = Math.acos(2 * Math.random() - 1)
-          initialPositions.push({
-            x: clusterCenterX + localR * Math.sin(localPhi) * Math.cos(localAngle),
-            y: clusterCenterY + localR * Math.sin(localPhi) * Math.sin(localAngle),
-            z: clusterCenterZ + localR * Math.cos(localPhi) * 0.4,
-            radius: 0.25,
-          })
-          nodeSizes.push(0.16 + Math.random() * 0.04)
-          nodeTypes.push('peripheral')
-        }
-      }
-
-      // ── Nodes — per-vertex size attribute for hierarchy ─────────────────
-      const nodePositions = new Float32Array(TOTAL_NODES * 3)
-      const nodeSizesArr = new Float32Array(TOTAL_NODES)
-      initialPositions.forEach((p, i) => {
-        nodePositions[i * 3]     = p.x
-        nodePositions[i * 3 + 1] = p.y
-        nodePositions[i * 3 + 2] = p.z
-        nodeSizesArr[i] = nodeSizes[i]
-      })
-
-      const nodeGeometry = new THREE.BufferGeometry()
-      const nodePositionAttr = new THREE.BufferAttribute(nodePositions, 3)
-      const nodeSizeAttr = new THREE.BufferAttribute(nodeSizesArr, 1)
-      nodeGeometry.setAttribute('position', nodePositionAttr)
-      nodeGeometry.setAttribute('aSize', nodeSizeAttr)
-
-      // Custom shader for per-vertex sized points with soft circular falloff
-      const nodeMaterial = new THREE.ShaderMaterial({
+      // ── Shader material ─────────────────────────────────────────────────
+      // The shader does:
+      //   1. Generate animated 2D simplex noise → small UV offset
+      //   2. For each active ripple: radial sine wave around its center → UV offset
+      //   3. Sample the video at offset UVs
+      //   4. Mix in a navy tint
+      //   5. Apply overall opacity (for scroll fade)
+      const material = new THREE.ShaderMaterial({
         uniforms: {
-          uOpacity: { value: 1.0 },
-          uColor:   { value: new THREE.Color(0xffffff) },
+          uVideo:          { value: videoTexture },
+          uTime:           { value: 0 },
+          uResolution:     { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+          uTintColor:      { value: new THREE.Vector3(TINT_COLOR.r, TINT_COLOR.g, TINT_COLOR.b) },
+          uTintStrength:   { value: TINT_STRENGTH },
+          uNoiseAmp:       { value: NOISE_AMPLITUDE },
+          uNoiseScale:     { value: NOISE_SCALE },
+          uNoiseSpeed:     { value: NOISE_SPEED },
+          uRipplePositions:{ value: ripplePositions },
+          uRippleAges:     { value: rippleAges },
+          uRippleActive:   { value: rippleActive },
+          uRippleAmp:      { value: RIPPLE_AMPLITUDE },
+          uRippleSpeed:    { value: RIPPLE_SPEED },
+          uRippleLife:     { value: RIPPLE_LIFE },
+          uOpacity:        { value: 1.0 },
         },
         vertexShader: /* glsl */ `
-          attribute float aSize;
-          varying float vSize;
+          varying vec2 vUv;
           void main() {
-            vSize = aSize;
-            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-            // Size attenuated by depth — far nodes smaller
-            gl_PointSize = aSize * 300.0 / -mvPosition.z;
-            gl_Position = projectionMatrix * mvPosition;
+            vUv = uv;
+            gl_Position = vec4(position.xy, 0.0, 1.0);
           }
         `,
+        // Fragment shader: simplex noise (Ashima Arts, BSD) + ripple field + refraction
         fragmentShader: /* glsl */ `
-          uniform float uOpacity;
-          uniform vec3  uColor;
-          varying float vSize;
+          precision highp float;
+
+          uniform sampler2D uVideo;
+          uniform float     uTime;
+          uniform vec2      uResolution;
+          uniform vec3      uTintColor;
+          uniform float     uTintStrength;
+          uniform float     uNoiseAmp;
+          uniform float     uNoiseScale;
+          uniform float     uNoiseSpeed;
+          uniform float     uRipplePositions[${MAX_RIPPLES * 2}];
+          uniform float     uRippleAges[${MAX_RIPPLES}];
+          uniform int       uRippleActive[${MAX_RIPPLES}];
+          uniform float     uRippleAmp;
+          uniform float     uRippleSpeed;
+          uniform float     uRippleLife;
+          uniform float     uOpacity;
+
+          varying vec2 vUv;
+
+          // ── 2D Simplex noise (Ashima Arts / Stefan Gustavson, BSD license) ─
+          vec3 mod289(vec3 x){ return x - floor(x * (1.0/289.0)) * 289.0; }
+          vec2 mod289(vec2 x){ return x - floor(x * (1.0/289.0)) * 289.0; }
+          vec3 permute(vec3 x){ return mod289(((x*34.0)+1.0)*x); }
+          float snoise(vec2 v){
+            const vec4 C = vec4(0.211324865405187, 0.366025403784439,
+                              -0.577350269189626, 0.024390243902439);
+            vec2 i  = floor(v + dot(v, C.yy));
+            vec2 x0 = v -   i + dot(i, C.xx);
+            vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+            vec4 x12 = x0.xyxy + C.xxzz;
+            x12.xy -= i1;
+            i = mod289(i);
+            vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0))
+                             + i.x + vec3(0.0, i1.x, 1.0));
+            vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+            m = m*m; m = m*m;
+            vec3 x = 2.0 * fract(p * C.www) - 1.0;
+            vec3 h = abs(x) - 0.5;
+            vec3 ox = floor(x + 0.5);
+            vec3 a0 = x - ox;
+            m *= 1.79284291400159 - 0.85373472095314 * (a0*a0 + h*h);
+            vec3 g;
+            g.x  = a0.x  * x0.x  + h.x  * x0.y;
+            g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+            return 130.0 * dot(m, g);
+          }
+
+          // Multi-octave noise — two layers of simplex at different frequencies
+          float fbm(vec2 p) {
+            float v = 0.0;
+            v += snoise(p)        * 0.55;
+            v += snoise(p * 2.1)  * 0.30;
+            return v;
+          }
+
           void main() {
-            // Soft round disc — center bright, edges fade out
-            vec2 c = gl_PointCoord - vec2(0.5);
-            float d = length(c);
-            if (d > 0.5) discard;
-            float alpha = smoothstep(0.5, 0.0, d) * uOpacity;
-            // Larger nodes get an extra-bright core
-            float coreBoost = smoothstep(0.5, 0.0, d) * (vSize * 0.5);
-            gl_FragColor = vec4(uColor + vec3(coreBoost), alpha);
+            vec2 uv = vUv;
+            float aspect = uResolution.x / uResolution.y;
+
+            // ── 1. Ambient ocean noise (two-axis displacement) ──────────────
+            vec2 noiseUV = uv * uNoiseScale;
+            noiseUV.x *= aspect; // keep noise circular not elliptical
+            float t = uTime * uNoiseSpeed;
+            float n1 = fbm(noiseUV + vec2(t, 0.0));
+            float n2 = fbm(noiseUV + vec2(0.0, t * 0.7) + 100.0);
+            vec2 noiseDisp = vec2(n1, n2) * uNoiseAmp;
+
+            // ── 2. Cursor ripples (sum of all active ripples) ───────────────
+            vec2 rippleDisp = vec2(0.0);
+            for (int i = 0; i < ${MAX_RIPPLES}; i++) {
+              if (uRippleActive[i] == 1) {
+                vec2 rp = vec2(uRipplePositions[i * 2], uRipplePositions[i * 2 + 1]);
+                vec2 toCenter = uv - rp;
+                toCenter.x *= aspect;
+                float dist = length(toCenter);
+                float age = uRippleAges[i];
+                float life = uRippleLife;
+                float t01 = age / life;             // 0 -> 1 over the ripple's life
+
+                // Expanding ring centered at (RIPPLE_SPEED * age)
+                float ringPos = age * uRippleSpeed;
+                float ringWidth = 0.15;
+                float ringStrength = exp(-pow((dist - ringPos) / ringWidth, 2.0));
+                float fade = pow(1.0 - t01, 2.0); // amplitude fades cubically
+
+                // Radial outward direction
+                vec2 dir = (dist > 0.0001) ? toCenter / dist : vec2(0.0);
+                rippleDisp += dir * ringStrength * fade * uRippleAmp;
+              }
+            }
+
+            // ── 3. Sample video at refracted UVs ────────────────────────────
+            vec2 totalDisp = noiseDisp + rippleDisp;
+            vec2 sampleUV = uv + totalDisp;
+            // Clamp UVs so we don't pull from outside the texture (edge artifacts)
+            sampleUV = clamp(sampleUV, 0.001, 0.999);
+            vec3 videoColor = texture2D(uVideo, sampleUV).rgb;
+
+            // ── 4. Mood tint ────────────────────────────────────────────────
+            vec3 col = mix(videoColor, uTintColor, uTintStrength);
+
+            // ── 5. Subtle specular highlight on wave crests ────────────────
+            // Where noise is positive (crest), add a small white pop. Gives
+            // the surface a sense of "wet" without overdoing it.
+            float crest = smoothstep(0.4, 0.9, n1);
+            col += vec3(crest * 0.06);
+
+            gl_FragColor = vec4(col, uOpacity);
           }
         `,
         transparent: true,
-        blending: THREE.AdditiveBlending,
+        depthTest: false,
         depthWrite: false,
       })
 
-      const nodePoints = new THREE.Points(nodeGeometry, nodeMaterial)
-      scene.add(nodePoints)
+      const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material)
+      scene.add(quad)
 
-      // ── Connection lines ───────────────────────────────────────────────
-      const maxLines = (TOTAL_NODES * (TOTAL_NODES - 1)) / 2
-      const linePositions = new Float32Array(maxLines * 2 * 3)
-      const lineColors = new Float32Array(maxLines * 2 * 3)
-      const lineGeometry = new THREE.BufferGeometry()
-      const linePositionAttr = new THREE.BufferAttribute(linePositions, 3)
-      const lineColorAttr = new THREE.BufferAttribute(lineColors, 3)
-      lineGeometry.setAttribute('position', linePositionAttr)
-      lineGeometry.setAttribute('color', lineColorAttr)
+      // ── Cursor tracking + ripple spawn ──────────────────────────────────
+      // We spawn a new ripple whenever the cursor has traveled RIPPLE_SPAWN_DIST
+      // (in normalized UV space) since the last spawn. That makes a continuous
+      // trail of ripples follow the cursor.
+      let lastSpawnX = -10
+      let lastSpawnY = -10
+      let nextRippleSlot = 0
 
-      const lineMaterial = new THREE.LineBasicMaterial({
-        vertexColors: true,
-        transparent: true,
-        opacity: 0.75,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-      })
-
-      const lineSegments = new THREE.LineSegments(lineGeometry, lineMaterial)
-      scene.add(lineSegments)
-
-      // ── Physics worker ──────────────────────────────────────────────────
-      const worker = new Worker('/physics-worker.js')
-      worker.postMessage({ type: 'init', nodes: initialPositions })
-
-      worker.onmessage = (e) => {
-        const msg = e.data
-        if (msg.type === 'transforms') {
-          nodePositions.set(msg.data as Float32Array)
-          nodePositionAttr.needsUpdate = true
+      const spawnRipple = (uvX: number, uvY: number) => {
+        // Find an inactive slot, or recycle the oldest
+        let slot = -1
+        for (let i = 0; i < MAX_RIPPLES; i++) {
+          if (!rippleActive[i]) { slot = i; break }
         }
+        if (slot === -1) {
+          slot = nextRippleSlot
+          nextRippleSlot = (nextRippleSlot + 1) % MAX_RIPPLES
+        }
+        ripplePositions[slot * 2]     = uvX
+        ripplePositions[slot * 2 + 1] = uvY
+        rippleAges[slot]   = 0
+        rippleActive[slot] = 1
       }
-
-      // ── Cursor tracking ─────────────────────────────────────────────────
-      // Listen on document (not window) and never deactivate while user
-      // is on the page. Removes the unreliable pointerleave behavior.
-      const raycaster = new THREE.Raycaster()
-      const ndc = new THREE.Vector2()
-      const cursorPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0)
-      const cursorWorld = new THREE.Vector3()
 
       const handlePointerMove = (e: PointerEvent) => {
-        ndc.x = (e.clientX / window.innerWidth) * 2 - 1
-        ndc.y = -(e.clientY / window.innerHeight) * 2 + 1
-        raycaster.setFromCamera(ndc, camera)
-        raycaster.ray.intersectPlane(cursorPlane, cursorWorld)
-        worker.postMessage({
-          type: 'cursor',
-          x: cursorWorld.x,
-          y: cursorWorld.y,
-          z: cursorWorld.z,
-          active: true,
-        })
+        // Convert to UV coords with origin top-left → bottom-left flip
+        const uvX = e.clientX / window.innerWidth
+        const uvY = 1 - e.clientY / window.innerHeight
+        const dx = uvX - lastSpawnX
+        const dy = uvY - lastSpawnY
+        if (dx * dx + dy * dy > RIPPLE_SPAWN_DIST * RIPPLE_SPAWN_DIST) {
+          spawnRipple(uvX, uvY)
+          lastSpawnX = uvX
+          lastSpawnY = uvY
+        }
       }
-      // Listen on document so the cursor is tracked over ANY element
       document.addEventListener('pointermove', handlePointerMove, { passive: true })
 
-      // ── ScrollTrigger — fade scene as user scrolls past hero ────────────
+      // ── Viewport observer (pause when offscreen) ────────────────────────
+      let inViewport = true
+      const observer = new IntersectionObserver(
+        ([entry]) => { inViewport = entry.isIntersecting },
+        { threshold: 0 }
+      )
+      observer.observe(container)
+
+      // ── Scroll fade ─────────────────────────────────────────────────────
       const scrollTrigger = ScrollTrigger.create({
         trigger: 'body',
         start: 'top top',
-        end: '+=800',
+        end: `+=${SCROLL_FADE_END}`,
         scrub: 0.5,
         onUpdate: (self) => {
-          const opacity = 1 - self.progress * 0.95
-          nodeMaterial.uniforms.uOpacity.value = opacity
-          lineMaterial.opacity = opacity * 0.75
-          camera.position.z = 14 + self.progress * 6
+          material.uniforms.uOpacity.value = 1 - self.progress * 0.92
         },
       })
 
       // ── Render loop ─────────────────────────────────────────────────────
       let lastTime = performance.now()
       let rafId = 0
-      let isVisible = true
-      const visibilityHandler = () => { isVisible = !document.hidden }
-      document.addEventListener('visibilitychange', visibilityHandler)
 
       const animate = () => {
         rafId = requestAnimationFrame(animate)
-        if (!isVisible) return
+        if (!inViewport || document.hidden) {
+          lastTime = performance.now()
+          return
+        }
 
         const now = performance.now()
         const dt = Math.min((now - lastTime) / 1000, 0.05)
         lastTime = now
 
-        worker.postMessage({ type: 'tick', dt })
-
-        // Recompute connection lines with color grading
-        let lineIndex = 0
-        const connectDistSq = CONNECTION_DISTANCE * CONNECTION_DISTANCE
-
-        for (let i = 0; i < TOTAL_NODES; i++) {
-          const ax = nodePositions[i * 3]
-          const ay = nodePositions[i * 3 + 1]
-          const az = nodePositions[i * 3 + 2]
-          const aIsHub = nodeTypes[i] === 'hub'
-          const aIsPrimary = nodeTypes[i] === 'primary'
-
-          for (let j = i + 1; j < TOTAL_NODES; j++) {
-            const bx = nodePositions[j * 3]
-            const by = nodePositions[j * 3 + 1]
-            const bz = nodePositions[j * 3 + 2]
-            const dx = ax - bx
-            const dy = ay - by
-            const dz = az - bz
-            const distSq = dx * dx + dy * dy + dz * dz
-            if (distSq < connectDistSq) {
-              const alpha = 1 - Math.sqrt(distSq) / CONNECTION_DISTANCE
-
-              // Hub-to-anything and primary-to-anything lines are brighter
-              const bIsHub = nodeTypes[j] === 'hub'
-              const bIsPrimary = nodeTypes[j] === 'primary'
-              const importance =
-                (aIsHub || bIsHub) ? 1.5 :
-                (aIsPrimary || bIsPrimary) ? 1.15 :
-                0.85
-
-              const o = lineIndex * 6
-              linePositions[o]     = ax
-              linePositions[o + 1] = ay
-              linePositions[o + 2] = az
-              linePositions[o + 3] = bx
-              linePositions[o + 4] = by
-              linePositions[o + 5] = bz
-
-              // Color grading: warm white near hub, cool blue at periphery
-              const distFromCenter = Math.sqrt(ax * ax + ay * ay + az * az)
-              const cooling = Math.min(distFromCenter / 8, 1)
-              const r = (0.95 - cooling * 0.55) * alpha * importance
-              const g = (0.97 - cooling * 0.30) * alpha * importance
-              const b = (1.00 - cooling * 0.05) * alpha * importance
-
-              lineColors[o]     = r
-              lineColors[o + 1] = g
-              lineColors[o + 2] = b
-              lineColors[o + 3] = r
-              lineColors[o + 4] = g
-              lineColors[o + 5] = b
-              lineIndex++
-            }
+        // Advance ripple ages, retire expired ones
+        for (let i = 0; i < MAX_RIPPLES; i++) {
+          if (rippleActive[i]) {
+            rippleAges[i] += dt
+            if (rippleAges[i] > RIPPLE_LIFE) rippleActive[i] = 0
           }
         }
 
-        linePositionAttr.needsUpdate = true
-        lineColorAttr.needsUpdate = true
-        lineGeometry.setDrawRange(0, lineIndex * 2)
+        material.uniforms.uTime.value = now / 1000
+        // Force uniform arrays to update (Three.js doesn't deep-compare them)
+        material.uniformsNeedUpdate = true
 
         renderer.render(scene, camera)
       }
@@ -313,12 +341,10 @@ export default function HeroWebGLScene() {
 
       // ── Resize ──────────────────────────────────────────────────────────
       const handleResize = () => {
-        if (!container) return
-        const w = container.clientWidth
-        const h = container.clientHeight
-        camera.aspect = w / h
-        camera.updateProjectionMatrix()
+        const w = window.innerWidth
+        const h = window.innerHeight
         renderer.setSize(w, h)
+        material.uniforms.uResolution.value.set(w, h)
       }
       window.addEventListener('resize', handleResize)
 
@@ -327,15 +353,14 @@ export default function HeroWebGLScene() {
         cancelAnimationFrame(rafId)
         document.removeEventListener('pointermove', handlePointerMove)
         window.removeEventListener('resize', handleResize)
-        document.removeEventListener('visibilitychange', visibilityHandler)
+        observer.disconnect()
         scrollTrigger.kill()
-        worker.postMessage({ type: 'dispose' })
-        worker.terminate()
-        nodeGeometry.dispose()
-        nodeMaterial.dispose()
-        lineGeometry.dispose()
-        lineMaterial.dispose()
+
+        quad.geometry.dispose()
+        material.dispose()
+        videoTexture.dispose()
         renderer.dispose()
+
         if (renderer.domElement.parentNode) {
           renderer.domElement.parentNode.removeChild(renderer.domElement)
         }
