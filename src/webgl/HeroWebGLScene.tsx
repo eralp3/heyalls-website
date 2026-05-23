@@ -1,45 +1,39 @@
 import { useEffect, useRef } from 'react'
 
 /**
- * HeroWebGLScene — Premium Sea Surface Refraction
+ * HeroWebGLScene — Subtle Sea Surface / Interactive Refraction
  * ────────────────────────────────────────────────────────────────────────────
- * Subtle, glass-like distortion of the existing HTML background video.
- * Mouse movement spawns expanding ripples in a trail.
- *
- * Conceptual mapping for HeyAlls:
- *   The brand surface is glass-clear but not static. It vibrates faintly and
- *   responds to user attention with concentric ripples — fluid, controlled,
- *   intentional.
+ * Glass-like distortion of the existing HTML background video.
+ *   • Cursor move → faint ripple trail
+ *   • Click → bigger, more impactful "splash" ripple
+ *   • Both types share one ripple buffer with per-slot amplitude
  *
  * Architecture:
  *   • Single fullscreen quad on an OrthographicCamera
  *   • VideoTexture from <video id="bg-video">
- *   • Custom fragment shader: simplex noise + ripple ring field → UV refraction
- *   • One draw call per frame, no render targets, no post-processing
- *
- * Required DOM contract:
- *   <video id="bg-video"> must exist somewhere in the page.
+ *   • Custom fragment shader: noise + ripple ring field → UV refraction
+ *   • One draw call per frame; no render targets, no post-processing
  */
 
 // ─── TUNING ─────────────────────────────────────────────────────────────────
-// "Premium subtle" — glass surface, not ocean. Tweak in one place.
-const TINT_COLOR        = { r: 0.00, g: 0.10, b: 0.17 }  // #001a2c brand navy
-const TINT_STRENGTH     = 0.45                            // 0 none → 1 solid
+const TINT_COLOR        = { r: 0.00, g: 0.10, b: 0.17 }  // #001a2c
+const TINT_STRENGTH     = 0.45
 
-const NOISE_AMPLITUDE   = 0.008    // micro vibration — small is intentional
-const NOISE_SCALE       = 6.5      // high frequency = fine texture
-const NOISE_SPEED       = 0.18     // ambient flow speed
+const NOISE_AMPLITUDE   = 0.007    // very subtle ambient surface vibration
+const NOISE_SCALE       = 6.5      // high frequency → fine "glass" texture
+const NOISE_SPEED       = 0.18
 
-const RIPPLE_AMPLITUDE  = 0.015    // subtle "system noticed you" feel
-const RIPPLE_RING_WIDTH = 0.08     // thinner = sharper ring
-const RIPPLE_SPEED      = 1.6      // outward expansion speed (units/sec)
-const RIPPLE_LIFE       = 1.8      // seconds before a ripple dies
-const RIPPLE_SPAWN_DIST = 0.03     // min UV travel before spawning next ripple
+const RIPPLE_MOVE_AMP   = 0.010    // light cursor-trail ripples
+const RIPPLE_CLICK_AMP  = 0.025    // bigger, more impactful click ripples
+const RIPPLE_RING_WIDTH = 0.08
+const RIPPLE_SPEED      = 1.6
+const RIPPLE_LIFE       = 1.8
+const RIPPLE_SPAWN_DIST = 0.03     // min UV travel between trail ripples
 
-const SPECULAR_INTENSITY = 0.06    // glassy highlight on noise crests
-const SCROLL_FADE_END    = 800     // px scroll over which scene fades out
+const SPECULAR_INTENSITY = 0.06
+const SCROLL_FADE_END    = 800
 
-const MAX_RIPPLES = 5              // matches GLSL array size
+const MAX_RIPPLES = 5
 
 export default function HeroWebGLScene() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -57,7 +51,7 @@ export default function HeroWebGLScene() {
       if (cancelled || !containerRef.current) return
       const container = containerRef.current
 
-      // ── DOM contract: find the background video ─────────────────────────
+      // ── DOM contract ────────────────────────────────────────────────────
       const videoEl = document.getElementById('bg-video') as HTMLVideoElement | null
       if (!videoEl) {
         console.warn('[HeroWebGLScene] No <video id="bg-video"> in DOM — refraction disabled')
@@ -82,37 +76,41 @@ export default function HeroWebGLScene() {
       const scene = new THREE.Scene()
       const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -1, 1)
 
-      // ── Video texture (SRGB color space for correct gamma) ──────────────
+      // ── Video texture (SRGB color space) ────────────────────────────────
       const videoTexture = new THREE.VideoTexture(videoEl)
       videoTexture.minFilter = THREE.LinearFilter
       videoTexture.magFilter = THREE.LinearFilter
       ;(videoTexture as unknown as { colorSpace?: string }).colorSpace = THREE.SRGBColorSpace
 
-      // ── Ripple ring buffer ──────────────────────────────────────────────
-      const ripplePositions = new Float32Array(MAX_RIPPLES * 2) // x, y in UV [0,1]
-      const rippleAges      = new Float32Array(MAX_RIPPLES)
-      const rippleActive    = new Int32Array(MAX_RIPPLES)       // 0/1 (int for GLSL)
+      // ── Ripple ring buffer (move + click ripples share this) ────────────
+      // Each ripple has: position (x,y in UV), age (s), active (0/1), amp.
+      // Per-slot amplitude lets click ripples coexist with move ripples
+      // without one overwriting the other's strength.
+      const ripplePositions  = new Float32Array(MAX_RIPPLES * 2)
+      const rippleAges       = new Float32Array(MAX_RIPPLES)
+      const rippleActive     = new Int32Array(MAX_RIPPLES)
+      const rippleAmplitudes = new Float32Array(MAX_RIPPLES)
 
       // ── Shader material ─────────────────────────────────────────────────
       const material = new THREE.ShaderMaterial({
         uniforms: {
-          uVideo:           { value: videoTexture },
-          uTime:            { value: 0 },
-          uResolution:      { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-          uTintColor:       { value: new THREE.Vector3(TINT_COLOR.r, TINT_COLOR.g, TINT_COLOR.b) },
-          uTintStrength:    { value: TINT_STRENGTH },
-          uNoiseAmp:        { value: NOISE_AMPLITUDE },
-          uNoiseScale:      { value: NOISE_SCALE },
-          uNoiseSpeed:      { value: NOISE_SPEED },
-          uRipplePositions: { value: ripplePositions },
-          uRippleAges:      { value: rippleAges },
-          uRippleActive:    { value: rippleActive },
-          uRippleAmp:       { value: RIPPLE_AMPLITUDE },
-          uRippleSpeed:     { value: RIPPLE_SPEED },
-          uRippleLife:      { value: RIPPLE_LIFE },
-          uRippleRingWidth: { value: RIPPLE_RING_WIDTH },
-          uSpecular:        { value: SPECULAR_INTENSITY },
-          uOpacity:         { value: 1.0 },
+          uVideo:            { value: videoTexture },
+          uTime:             { value: 0 },
+          uResolution:       { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+          uTintColor:        { value: new THREE.Vector3(TINT_COLOR.r, TINT_COLOR.g, TINT_COLOR.b) },
+          uTintStrength:     { value: TINT_STRENGTH },
+          uNoiseAmp:         { value: NOISE_AMPLITUDE },
+          uNoiseScale:       { value: NOISE_SCALE },
+          uNoiseSpeed:       { value: NOISE_SPEED },
+          uRipplePositions:  { value: ripplePositions },
+          uRippleAges:       { value: rippleAges },
+          uRippleActive:     { value: rippleActive },
+          uRippleAmplitudes: { value: rippleAmplitudes },
+          uRippleSpeed:      { value: RIPPLE_SPEED },
+          uRippleLife:       { value: RIPPLE_LIFE },
+          uRippleRingWidth:  { value: RIPPLE_RING_WIDTH },
+          uSpecular:         { value: SPECULAR_INTENSITY },
+          uOpacity:          { value: 1.0 },
         },
         vertexShader: /* glsl */ `
           varying vec2 vUv;
@@ -135,7 +133,7 @@ export default function HeroWebGLScene() {
           uniform float     uRipplePositions[${MAX_RIPPLES * 2}];
           uniform float     uRippleAges[${MAX_RIPPLES}];
           uniform int       uRippleActive[${MAX_RIPPLES}];
-          uniform float     uRippleAmp;
+          uniform float     uRippleAmplitudes[${MAX_RIPPLES}];
           uniform float     uRippleSpeed;
           uniform float     uRippleLife;
           uniform float     uRippleRingWidth;
@@ -145,9 +143,9 @@ export default function HeroWebGLScene() {
           varying vec2 vUv;
 
           // ── 2D Simplex noise (Ashima Arts / Stefan Gustavson, BSD) ──────
-          vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-          vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-          vec3 permute(vec3 x) { return mod289(((x * 34.0) + 1.0) * x); }
+          vec3 mod289(vec3 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
+          vec2 mod289(vec2 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
+          vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
           float snoise(vec2 v) {
             const vec4 C = vec4(0.211324865405187, 0.366025403784439,
                               -0.577350269189626, 0.024390243902439);
@@ -160,21 +158,19 @@ export default function HeroWebGLScene() {
             vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0))
                              + i.x + vec3(0.0, i1.x, 1.0));
             vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
-            m = m * m; m = m * m;
+            m = m*m; m = m*m;
             vec3 x = 2.0 * fract(p * C.www) - 1.0;
             vec3 h = abs(x) - 0.5;
             vec3 ox = floor(x + 0.5);
             vec3 a0 = x - ox;
-            m *= 1.79284291400159 - 0.85373472095314 * (a0 * a0 + h * h);
+            m *= 1.79284291400159 - 0.85373472095314 * (a0*a0 + h*h);
             vec3 g;
             g.x  = a0.x  * x0.x  + h.x  * x0.y;
             g.yz = a0.yz * x12.xz + h.yz * x12.yw;
             return 130.0 * dot(m, g);
           }
 
-          // Multi-octave noise: main octave + faint high-frequency shimmer
-          // (Second octave weight is intentionally tiny — at this scale,
-          // its features are sub-pixel, so we use it for "texture" not shape.)
+          // Multi-octave: dominant low + faint high-frequency shimmer
           float fbm(vec2 p) {
             return snoise(p) * 0.85 + snoise(p * 2.1) * 0.15;
           }
@@ -183,15 +179,15 @@ export default function HeroWebGLScene() {
             vec2 uv = vUv;
             float aspect = uResolution.x / uResolution.y;
 
-            // ── 1. Ambient noise → tiny UV displacement ─────────────────────
+            // ── 1. Ambient noise displacement ───────────────────────────────
             vec2 noiseUV = uv * uNoiseScale;
-            noiseUV.x *= aspect; // keep noise circular, not stretched
+            noiseUV.x *= aspect;
             float t = uTime * uNoiseSpeed;
             float n1 = fbm(noiseUV + vec2(t, 0.0));
             float n2 = fbm(noiseUV + vec2(0.0, t * 0.7) + 100.0);
             vec2 noiseDisp = vec2(n1, n2) * uNoiseAmp;
 
-            // ── 2. Sum of active ripples → ring displacement ────────────────
+            // ── 2. Sum of active ripples (per-slot amplitude) ───────────────
             vec2 rippleDisp = vec2(0.0);
             for (int i = 0; i < ${MAX_RIPPLES}; i++) {
               if (uRippleActive[i] == 1) {
@@ -201,16 +197,13 @@ export default function HeroWebGLScene() {
                 float dist = length(toCenter);
 
                 float age  = uRippleAges[i];
-                float life = uRippleLife;
-                float t01  = age / life;
-
-                // Expanding ring centered on (RIPPLE_SPEED * age)
+                float t01  = age / uRippleLife;
                 float ringPos = age * uRippleSpeed;
                 float ringStrength = exp(-pow((dist - ringPos) / uRippleRingWidth, 2.0));
                 float fade = pow(1.0 - t01, 2.0);
 
                 vec2 dir = (dist > 0.0001) ? toCenter / dist : vec2(0.0);
-                rippleDisp += dir * ringStrength * fade * uRippleAmp;
+                rippleDisp += dir * ringStrength * fade * uRippleAmplitudes[i];
               }
             }
 
@@ -218,7 +211,7 @@ export default function HeroWebGLScene() {
             vec2 sampleUV = clamp(uv + noiseDisp + rippleDisp, 0.001, 0.999);
             vec3 videoColor = texture2D(uVideo, sampleUV).rgb;
 
-            // ── 4. Navy tint blend ──────────────────────────────────────────
+            // ── 4. Navy tint ────────────────────────────────────────────────
             vec3 col = mix(videoColor, uTintColor, uTintStrength);
 
             // ── 5. Glassy specular highlight on noise crests ────────────────
@@ -237,12 +230,9 @@ export default function HeroWebGLScene() {
       const quad = new THREE.Mesh(geometry, material)
       scene.add(quad)
 
-      // ── Cursor → ripple trail ──────────────────────────────────────────
-      let lastSpawnX = -10
-      let lastSpawnY = -10
-
-      const spawnRipple = (uvX: number, uvY: number) => {
-        // Find an inactive slot; if all are taken, recycle the oldest
+      // ── Ripple spawning (shared by move + click) ────────────────────────
+      const spawnRipple = (uvX: number, uvY: number, amplitude: number) => {
+        // Find an inactive slot, otherwise recycle the oldest
         let slot = -1
         let oldestAge = -1
         let oldestIdx = 0
@@ -254,22 +244,34 @@ export default function HeroWebGLScene() {
 
         ripplePositions[slot * 2]     = uvX
         ripplePositions[slot * 2 + 1] = uvY
-        rippleAges[slot]   = 0
-        rippleActive[slot] = 1
+        rippleAges[slot]       = 0
+        rippleActive[slot]     = 1
+        rippleAmplitudes[slot] = amplitude
       }
 
+      // ── Pointer MOVE — trail of subtle ripples ──────────────────────────
+      let lastSpawnX = -10
+      let lastSpawnY = -10
       const handlePointerMove = (e: PointerEvent) => {
         const uvX = e.clientX / window.innerWidth
         const uvY = 1 - e.clientY / window.innerHeight
         const dx = uvX - lastSpawnX
         const dy = uvY - lastSpawnY
         if (dx * dx + dy * dy > RIPPLE_SPAWN_DIST * RIPPLE_SPAWN_DIST) {
-          spawnRipple(uvX, uvY)
+          spawnRipple(uvX, uvY, RIPPLE_MOVE_AMP)
           lastSpawnX = uvX
           lastSpawnY = uvY
         }
       }
       document.addEventListener('pointermove', handlePointerMove, { passive: true })
+
+      // ── Pointer DOWN — single, larger "splash" ──────────────────────────
+      const handlePointerDown = (e: PointerEvent) => {
+        const uvX = e.clientX / window.innerWidth
+        const uvY = 1 - e.clientY / window.innerHeight
+        spawnRipple(uvX, uvY, RIPPLE_CLICK_AMP)
+      }
+      document.addEventListener('pointerdown', handlePointerDown, { passive: true })
 
       // ── Viewport observer (pause RAF when offscreen) ────────────────────
       let inViewport = true
@@ -314,7 +316,6 @@ export default function HeroWebGLScene() {
         }
 
         material.uniforms.uTime.value = now / 1000
-        // Three.js doesn't deep-compare uniform arrays — force re-upload
         material.uniformsNeedUpdate = true
 
         renderer.render(scene, camera)
@@ -330,10 +331,11 @@ export default function HeroWebGLScene() {
       }
       window.addEventListener('resize', handleResize)
 
-      // ── Cleanup (strict — no leaks) ─────────────────────────────────────
+      // ── Cleanup (strict, no leaks) ──────────────────────────────────────
       cleanupRef.current = () => {
         cancelAnimationFrame(rafId)
         document.removeEventListener('pointermove', handlePointerMove)
+        document.removeEventListener('pointerdown', handlePointerDown)
         window.removeEventListener('resize', handleResize)
         observer.disconnect()
         scrollTrigger.kill()
