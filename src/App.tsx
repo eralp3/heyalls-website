@@ -4,6 +4,7 @@ import type { ReactNode, ErrorInfo } from 'react'
 import PageTransition from './components/PageTransition'
 import CursorSpotlight from './components/CursorSpotlight'
 import { useAnalytics } from './hooks/useAnalytics'
+import AudioToggle from './components/AudioToggle'
 
 const Home = lazy(() => import('./pages/Home'))
 const Services = lazy(() => import('./pages/Services'))
@@ -113,6 +114,7 @@ function App() {
       <Router>
         <CursorSpotlight />
         <AnimatedRoutes />
+        <AudioToggle />
       </Router>
     </ErrorBoundary>
   )
