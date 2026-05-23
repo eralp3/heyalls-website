@@ -11,6 +11,7 @@ import { useTilt } from '@/hooks/useTilt'
 import { useScrollReveal } from '@/hooks/useScrollReveal'
 import { useScrollToInput } from '@/hooks/useScrollToInput'
 import { useToast, ToastContainer } from '@/hooks/useToast'
+import WebGLLayer from '@/components/WebGLLayer'
 
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID ?? ''
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID ?? ''
@@ -75,6 +76,7 @@ export default function Home() {
   return (
     <div className="relative min-h-screen w-full bg-[#001a2c] text-white selection:bg-white/20">
       <VideoBackground overlayOpacity="light" />
+      <WebGLLayer />
       <Navbar activePage="home" />
       <StickyMobileCTA />
 
