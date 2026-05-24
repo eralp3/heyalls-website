@@ -9,8 +9,8 @@ import { useScrollReveal } from '@/hooks/useScrollReveal'
 
 export default function PatronTour() {
   useSEO(
-    'Patron Tour Performans Pazarlama | HeyAlls Case Study',
-    'Etkileşim odaklı sosyal medya yönetimi ve agresif Meta reklam operasyonlarıyla Patron Tour\'un dijital büyüme hikayesi.'
+    'Patron Tour · Performans Pazarlama Sistemi | HeyAlls Case Study',
+    'Sıfırdan kurduğumuz Meta huni mimarisi ve veri destekli reklam operasyonlarıyla Patron Tour için inşa ettiğimiz performans pazarlama sistemi.'
   )
 
   useEffect(() => { window.scrollTo(0, 0) }, [])
@@ -25,7 +25,6 @@ export default function PatronTour() {
       <VideoBackground overlayOpacity="dark" />
       <Navbar />
 
-      {/* Hero */}
       <main className="relative z-10 pt-40 pb-20 px-6 max-w-7xl mx-auto flex flex-col items-center text-center">
         <div className="inline-flex gap-3 mb-8 animate-fade-rise">
           <span className="px-4 py-1.5 bg-white/5 backdrop-blur-md rounded-full text-xs text-white/70 uppercase tracking-widest border border-white/10">Performans Pazarlama</span>
@@ -35,11 +34,10 @@ export default function PatronTour() {
           Patron Tour
         </h1>
         <p className="text-white/60 text-lg md:text-xl max-w-2xl font-light leading-relaxed animate-fade-rise-delay">
-          Etkileşim odaklı sosyal medya yönetimi ve veri destekli Meta reklam operasyonlarıyla sürdürülebilir dijital büyüme.
+          Meta huni mimarisini sıfırdan kurduk; hedef kitle segmentasyonunu ve retargeting akışlarını veri üzerinden optimize ettik. [Reklam yatırımının geri dönüşünü 2.4 katına çıkardık.]
         </p>
       </main>
 
-      {/* Metrics */}
       <section className="relative z-10 max-w-5xl mx-auto px-6 pb-20 animate-fade-rise-delay-2">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
@@ -56,10 +54,8 @@ export default function PatronTour() {
         </div>
       </section>
 
-      {/* Case Study Content */}
       <section className="relative z-10 max-w-4xl mx-auto px-6 py-20 space-y-32">
 
-        {/* Challenge */}
         <div ref={challengeRef} className="flex flex-col md:flex-row gap-12 items-start">
           <div className="md:w-1/3">
             <h2 className="text-3xl text-white sticky top-32" style={displayFont}>Meydan Okuma</h2>
@@ -74,7 +70,6 @@ export default function PatronTour() {
           </div>
         </div>
 
-        {/* Visual Mockup — Social dashboard simulation */}
         <div ref={mockupRef} className="w-full aspect-video bg-white/[0.02] rounded-[2rem] border border-white/10 backdrop-blur-sm relative group overflow-hidden shadow-2xl">
           <div className="absolute top-0 left-0 w-full h-10 bg-white/5 border-b border-white/5 flex items-center px-6 gap-2">
             <div className="w-2.5 h-2.5 rounded-full bg-red-500/40" />
@@ -83,7 +78,6 @@ export default function PatronTour() {
             <div className="ml-4 h-4 w-44 bg-white/5 rounded-full" />
           </div>
           <div className="pt-14 px-6 grid grid-cols-12 gap-4 h-full pb-6 opacity-40 group-hover:opacity-100 transition-opacity duration-700">
-            {/* Sidebar */}
             <div className="col-span-3 space-y-3 pt-2">
               <div className="h-5 w-full bg-emerald-500/20 rounded-lg" />
               {['Genel Bakış', 'Kampanyalar', 'Kitleler', 'Raporlar'].map(item => (
@@ -93,9 +87,7 @@ export default function PatronTour() {
                 </div>
               ))}
             </div>
-            {/* Main content */}
             <div className="col-span-9 space-y-4 pt-2">
-              {/* KPI row */}
               <div className="grid grid-cols-4 gap-3">
                 {[
                   { label: 'Erişim', color: 'bg-emerald-500/10' },
@@ -109,7 +101,6 @@ export default function PatronTour() {
                   </div>
                 ))}
               </div>
-              {/* Chart simulation */}
               <div className="h-28 bg-white/[0.02] rounded-2xl border border-white/5 flex items-end px-4 pb-3 gap-2">
                 {[40, 55, 35, 70, 60, 80, 65, 90, 75, 95, 85, 100].map((h, i) => (
                   <div
@@ -119,7 +110,6 @@ export default function PatronTour() {
                   />
                 ))}
               </div>
-              {/* Campaign rows */}
               <div className="space-y-2">
                 {[85, 62, 48].map((w, i) => (
                   <div key={i} className="flex items-center gap-3 bg-white/[0.02] rounded-xl p-3 border border-white/5">
@@ -140,7 +130,6 @@ export default function PatronTour() {
           </div>
         </div>
 
-        {/* Solution */}
         <div ref={solutionRef} className="flex flex-col md:flex-row gap-12 items-start">
           <div className="md:w-1/3">
             <h2 className="text-3xl text-white sticky top-32" style={displayFont}>Çözüm Mimarisi</h2>
@@ -158,7 +147,6 @@ export default function PatronTour() {
           </div>
         </div>
 
-        {/* Results */}
         <div ref={resultsRef} className="flex flex-col md:flex-row gap-12 items-start">
           <div className="md:w-1/3">
             <h2 className="text-3xl text-white sticky top-32" style={displayFont}>Sonuçlar</h2>
@@ -179,7 +167,6 @@ export default function PatronTour() {
 
       </section>
 
-      {/* Nav */}
       <section className="relative z-10 w-full border-t border-white/10 bg-white/[0.02] backdrop-blur-xl mt-20">
         <Link to="/calismalarimiz" className="block max-w-7xl mx-auto px-6 py-20 group">
           <span className="text-white/40 text-xs tracking-widest uppercase mb-4 block group-hover:text-emerald-400 transition-colors">Portfolyoya Dön</span>

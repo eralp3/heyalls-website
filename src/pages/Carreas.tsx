@@ -9,8 +9,8 @@ import { useScrollReveal } from '@/hooks/useScrollReveal'
 
 export default function Carreas() {
   useSEO(
-    'Carreas E-Ticaret Yönetimi | HeyAlls Case Study',
-    'Sokak modasının dinamik markası Carreas için Shopier altyapısında vitrin optimizasyonu, SEO uyumlu içerik ve dönüşüm artışı.'
+    'Carreas · Vitrin & Dönüşüm Optimizasyonu | HeyAlls Case Study',
+    'Shopier vitrinini sokak modasının diline yeniden yazdığımız vaka çalışması: SEO ve dönüşüm odaklı içerik mimarisi.'
   )
 
   useEffect(() => { window.scrollTo(0, 0) }, [])
@@ -25,7 +25,6 @@ export default function Carreas() {
       <VideoBackground overlayOpacity="dark" />
       <Navbar />
 
-      {/* Hero */}
       <main className="relative z-10 pt-40 pb-20 px-6 max-w-7xl mx-auto flex flex-col items-center text-center">
         <div className="inline-flex gap-3 mb-8 animate-fade-rise">
           <span className="px-4 py-1.5 bg-white/5 backdrop-blur-md rounded-full text-xs text-white/70 uppercase tracking-widest border border-white/10">Vitrin Yönetimi</span>
@@ -35,11 +34,10 @@ export default function Carreas() {
           Carreas
         </h1>
         <p className="text-white/60 text-lg md:text-xl max-w-2xl font-light leading-relaxed animate-fade-rise-delay">
-          Sokak modasının dinamik markası için Shopier altyapısında kapsamlı vitrin optimizasyonu ve dönüşüm odaklı içerik stratejisi.
+          Shopier vitrinini sokak modasının diline yeniden yazdık; her ürünü SEO ve dönüşüm odaklı bir hikayeyle konumlandırdık. [Organik trafiği 4 aylık süreçte %180 büyüttük.]
         </p>
       </main>
 
-      {/* Metrics */}
       <section className="relative z-10 max-w-5xl mx-auto px-6 pb-20 animate-fade-rise-delay-2">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
@@ -56,10 +54,8 @@ export default function Carreas() {
         </div>
       </section>
 
-      {/* Case Study Content */}
       <section className="relative z-10 max-w-4xl mx-auto px-6 py-20 space-y-32">
 
-        {/* Challenge */}
         <div ref={challengeRef} className="flex flex-col md:flex-row gap-12 items-start">
           <div className="md:w-1/3">
             <h2 className="text-3xl text-white sticky top-32" style={displayFont}>Meydan Okuma</h2>
@@ -69,12 +65,11 @@ export default function Carreas() {
               Carreas, genç ve dinamik bir sokak modası markası olarak özgün bir tasarım diline sahipti. Ancak bu güçlü kimlik, dijital mağazaya yeterince yansımıyordu. Ürün sayfaları ziyaretçileri satın alma kararına götürmekte yetersiz kalıyor; organik arama trafiği ise potansiyelinin çok altında seyrediyordu.
             </p>
             <p>
-              Mevcut ürün açıklamaları teknik detaylardan yoksun, SEO açısından optimize edilmemiş ve marka sesine uymayan jenerik metinlerden oluşuyordu. Bunun yanı sıra vitrin yapısı, müşterinin ürüne güvenmesini sağlayacak sosyal kanıt öğelerinden de yoksundu.
+              Mevcut ürün açıklamaları teknik detaylardan yoksun, SEO açısından optimize edilmemiş ve marka sesine uymayan jenerik metinlerden oluşuyordu. Vitrin yapısı, müşterinin ürüne güvenmesini sağlayacak sosyal kanıt öğelerinden de yoksundu.
             </p>
           </div>
         </div>
 
-        {/* Visual Mockup */}
         <div ref={mockupRef} className="w-full aspect-video bg-white/[0.02] rounded-[2rem] border border-white/10 backdrop-blur-sm relative group overflow-hidden shadow-2xl">
           <div className="absolute top-0 left-0 w-full h-10 bg-white/5 border-b border-white/5 flex items-center px-6 gap-2">
             <div className="w-2.5 h-2.5 rounded-full bg-red-500/40" />
@@ -83,7 +78,6 @@ export default function Carreas() {
             <div className="ml-4 h-4 w-36 bg-white/5 rounded-full" />
           </div>
           <div className="pt-16 px-8 h-full opacity-40 group-hover:opacity-100 transition-opacity duration-700">
-            {/* Store layout simulation */}
             <div className="grid grid-cols-12 gap-6 h-full">
               <div className="col-span-5 space-y-4">
                 <div className="aspect-square bg-white/[0.04] rounded-2xl border border-white/5 flex items-center justify-center max-h-44">
@@ -121,7 +115,6 @@ export default function Carreas() {
           </div>
         </div>
 
-        {/* Solution */}
         <div ref={solutionRef} className="flex flex-col md:flex-row gap-12 items-start">
           <div className="md:w-1/3">
             <h2 className="text-3xl text-white sticky top-32" style={displayFont}>Çözüm Mimarisi</h2>
@@ -139,7 +132,6 @@ export default function Carreas() {
           </div>
         </div>
 
-        {/* Results */}
         <div ref={resultsRef} className="flex flex-col md:flex-row gap-12 items-start">
           <div className="md:w-1/3">
             <h2 className="text-3xl text-white sticky top-32" style={displayFont}>Sonuçlar</h2>
@@ -160,7 +152,6 @@ export default function Carreas() {
 
       </section>
 
-      {/* Next Project Nav */}
       <section className="relative z-10 w-full border-t border-white/10 bg-white/[0.02] backdrop-blur-xl mt-20">
         <Link to="/calismalarimiz" className="block max-w-7xl mx-auto px-6 py-20 group">
           <span className="text-white/40 text-xs tracking-widest uppercase mb-4 block group-hover:text-white/60 transition-colors">Portfolyoya Dön</span>

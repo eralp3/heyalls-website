@@ -9,8 +9,8 @@ import { useScrollReveal } from '@/hooks/useScrollReveal'
 
 export default function Orimo() {
   useSEO(
-    'Orimo Auto Katalog Operasyonu | HeyAlls Case Study',
-    'Avrupa pazarına açılan üst segment otomotiv aksesuar markası için küresel standartlarda e-ticaret veri entegrasyonu ve listeleme mimarisi.'
+    'Orimo Auto · Avrupa E-Ticaret Operasyonu | HeyAlls Case Study',
+    'Üst segment krom aksesuar markasını birden fazla Avrupa pazarında eşzamanlı sahaya çıkardığımız küresel e-ticaret operasyonu.'
   )
 
   useEffect(() => { window.scrollTo(0, 0) }, [])
@@ -25,7 +25,6 @@ export default function Orimo() {
       <VideoBackground overlayOpacity="dark" />
       <Navbar />
 
-      {/* Hero */}
       <main className="relative z-10 pt-40 pb-20 px-6 max-w-7xl mx-auto flex flex-col items-center text-center">
         <div className="inline-flex gap-3 mb-8 animate-fade-rise">
           <span className="px-4 py-1.5 bg-white/5 backdrop-blur-md rounded-full text-xs text-white/70 uppercase tracking-widest border border-white/10">Avrupa Pazarı</span>
@@ -35,11 +34,10 @@ export default function Orimo() {
           Orimo Auto
         </h1>
         <p className="text-white/60 text-lg md:text-xl max-w-2xl font-light leading-relaxed animate-fade-rise-delay">
-          Üst segment otomotiv krom aksesuar markasını Avrupa pazarına taşıyan küresel e-ticaret altyapısı ve veri entegrasyonu.
+          Üst segment krom aksesuar markasını [6 Avrupa ülkesinde eşzamanlı olarak] sahaya çıkardık. Çok kanallı katalog mimarisi ve veri entegrasyonu ile operasyonel yükü tek panele indirdik.
         </p>
       </main>
 
-      {/* Metrics */}
       <section className="relative z-10 max-w-5xl mx-auto px-6 pb-20 animate-fade-rise-delay-2">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
@@ -56,10 +54,8 @@ export default function Orimo() {
         </div>
       </section>
 
-      {/* Case Study Content */}
       <section className="relative z-10 max-w-4xl mx-auto px-6 py-20 space-y-32">
 
-        {/* Challenge */}
         <div ref={challengeRef} className="flex flex-col md:flex-row gap-12 items-start">
           <div className="md:w-1/3">
             <h2 className="text-3xl text-white sticky top-32" style={displayFont}>Meydan Okuma</h2>
@@ -69,12 +65,11 @@ export default function Orimo() {
               Orimo Auto, yüksek kaliteli krom otomotiv aksesuarları üreticisi olarak Türkiye pazarında güçlü bir konuma sahipti. Ancak marka, Avrupa'nın rekabetçi e-ticaret ekosistemine giriş yapma konusunda ciddi engellerle karşı karşıyaydı.
             </p>
             <p>
-              Ürün katalogları farklı Avrupa pazaryerlerinin gerektirdiği standartlara uygun değildi; başlıklar, açıklamalar ve teknik veriler her platform için ayrı ayrı optimize edilmesi gereken karmaşık bir yapı oluşturuyordu. Bunun yanı sıra dil engeli, farklı vergi ve gümrük gereksinimleri operasyonu daha da zorlaştırıyordu.
+              Ürün katalogları farklı Avrupa pazaryerlerinin gerektirdiği standartlara uygun değildi; başlıklar, açıklamalar ve teknik veriler her platform için ayrı ayrı optimize edilmesi gereken karmaşık bir yapı oluşturuyordu. Dil engeli, farklı vergi ve gümrük gereksinimleri operasyonu daha da zorlaştırıyordu.
             </p>
           </div>
         </div>
 
-        {/* Visual Mockup */}
         <div ref={mockupRef} className="w-full aspect-video bg-white/[0.02] rounded-[2rem] border border-white/10 backdrop-blur-sm relative group overflow-hidden shadow-2xl">
           <div className="absolute top-0 left-0 w-full h-10 bg-white/5 border-b border-white/5 flex items-center px-6 gap-2">
             <div className="w-2.5 h-2.5 rounded-full bg-red-500/40" />
@@ -83,7 +78,6 @@ export default function Orimo() {
             <div className="ml-4 h-4 w-48 bg-white/5 rounded-full" />
           </div>
           <div className="pt-16 px-8 grid grid-cols-12 gap-4 h-full opacity-40 group-hover:opacity-100 transition-opacity duration-700">
-            {/* Product grid simulation */}
             <div className="col-span-3 space-y-3 pt-2">
               <div className="h-5 w-full bg-purple-500/20 rounded-lg" />
               <div className="h-4 w-3/4 bg-white/5 rounded-full" />
@@ -115,7 +109,6 @@ export default function Orimo() {
           </div>
         </div>
 
-        {/* Solution */}
         <div ref={solutionRef} className="flex flex-col md:flex-row gap-12 items-start">
           <div className="md:w-1/3">
             <h2 className="text-3xl text-white sticky top-32" style={displayFont}>Çözüm Mimarisi</h2>
@@ -128,12 +121,11 @@ export default function Orimo() {
               Ürün başlıkları, bullet point açıklamaları ve teknik özellik tabloları; her platform için arama algoritmalarını ve yerel tüketici davranışlarını göz önünde bulundurarak yeniden yapılandırıldı. SEO odaklı içerik stratejisiyle organik görünürlük maksimize edildi.
             </p>
             <p>
-              Stok yönetimi, fiyatlandırma güncellemeleri ve sipariş akışlarını tek merkezden yönetebilmek için <strong>çok kanallı entegrasyon altyapısı</strong> kurgulandı. Bu sayede Orimo ekibi, onlarca farklı platformu tek bir dashboard üzerinden yönetir hale geldi.
+              Stok yönetimi, fiyatlandırma güncellemeleri ve sipariş akışlarını tek merkezden yönetebilmek için <strong>çok kanallı entegrasyon altyapısı</strong> kurguladık. Bu sayede Orimo ekibi, onlarca farklı platformu tek bir dashboard üzerinden yönetir hale geldi.
             </p>
           </div>
         </div>
 
-        {/* Results */}
         <div ref={resultsRef} className="flex flex-col md:flex-row gap-12 items-start">
           <div className="md:w-1/3">
             <h2 className="text-3xl text-white sticky top-32" style={displayFont}>Sonuçlar</h2>
@@ -154,7 +146,6 @@ export default function Orimo() {
 
       </section>
 
-      {/* Next Project Nav */}
       <section className="relative z-10 w-full border-t border-white/10 bg-white/[0.02] backdrop-blur-xl mt-20">
         <Link to="/calismalarimiz" className="block max-w-7xl mx-auto px-6 py-20 group">
           <span className="text-white/40 text-xs tracking-widest uppercase mb-4 block group-hover:text-purple-400 transition-colors">Portfolyoya Dön</span>
