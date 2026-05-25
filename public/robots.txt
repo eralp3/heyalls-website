@@ -1,0 +1,11 @@
+# HeyAlls — robots.txt
+# Allow all search engines to crawl all paths.
+
+User-agent: *
+Allow: /
+
+# Block API-style routes if you ever add any
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://heyalls.com/sitemap.xml

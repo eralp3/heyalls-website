@@ -29,6 +29,18 @@ const services = [
   { id: 'danismanlik', label: 'Proje Danışmanlığı' },
 ]
 
+// ── Validation helpers ─────────────────────────────────────────────────────
+// HTML5-style email regex — covers ~99% of valid addresses without
+// false-flagging unusual but legal ones (subdomains, +, etc.)
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+interface FormErrors {
+  name?: string
+  email?: string
+  message?: string
+  service?: string
+}
+
 export default function Home() {
   useSEO(
     'HeyAlls | Uçtan Uca Dijital Çözüm Merkezi',
@@ -47,23 +59,102 @@ export default function Home() {
   const formRef = useRef<HTMLFormElement>(null)
   useScrollToInput(formRef)
 
+  // ── Form state ──────────────────────────────────────────────────────────
   const [selectedService, setSelectedService] = useState<string | null>(null)
   const [isSending, setIsSending] = useState(false)
-  const [serviceError, setServiceError] = useState(false)
+  const [errors, setErrors] = useState<FormErrors>({})
+  // Honeypot field — bots fill it, humans don't (it's invisible)
+  const [honeypot, setHoneypot] = useState('')
+
+  // ── Field-level validators ──────────────────────────────────────────────
+  const validateField = (name: string, value: string): string | undefined => {
+    if (name === 'user_name') {
+      if (!value.trim()) return 'Lütfen isim veya marka adınızı girin.'
+      if (value.trim().length < 2) return 'En az 2 karakter girmelisiniz.'
+    }
+    if (name === 'user_email') {
+      if (!value.trim()) return 'E-posta adresi gereklidir.'
+      if (!EMAIL_REGEX.test(value.trim())) return 'Geçerli bir e-posta adresi girin.'
+    }
+    if (name === 'message') {
+      if (!value.trim()) return 'Lütfen proje detaylarını paylaşın.'
+      if (value.trim().length < 10) return 'En az 10 karakterlik bir mesaj yazın.'
+    }
+    return undefined
+  }
+
+  // Live: clear an error when the user fixes that field
+  const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setErrors((prev) => {
+      // Map DOM field names to our error keys
+      const key =
+        name === 'user_name' ? 'name'
+        : name === 'user_email' ? 'email'
+        : name === 'message' ? 'message'
+        : null
+      if (!key || !prev[key]) return prev
+      const nextError = validateField(name, value)
+      if (nextError === prev[key]) return prev
+      return { ...prev, [key]: nextError }
+    })
+  }
+
+  // ── Full validation on submit ───────────────────────────────────────────
+  const validateAll = (): FormErrors => {
+    const form = formRef.current
+    if (!form) return {}
+
+    const fd = new FormData(form)
+    const nameVal    = String(fd.get('user_name') ?? '')
+    const emailVal   = String(fd.get('user_email') ?? '')
+    const messageVal = String(fd.get('message') ?? '')
+
+    const next: FormErrors = {}
+    const nameErr    = validateField('user_name', nameVal);    if (nameErr) next.name = nameErr
+    const emailErr   = validateField('user_email', emailVal);  if (emailErr) next.email = emailErr
+    const messageErr = validateField('message', messageVal);   if (messageErr) next.message = messageErr
+    if (!selectedService) next.service = 'Lütfen bir hizmet türü seçin.'
+
+    return next
+  }
 
   const sendEmail = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!selectedService) { setServiceError(true); return }
-    setServiceError(false)
-    setIsSending(true)
 
+    // ── Honeypot guard ──────────────────────────────────────────────────────
+    // A real user can never fill this (display: none). If it's not empty,
+    // silently "succeed" so the bot thinks it worked.
+    if (honeypot !== '') {
+      if (import.meta.env.DEV) console.warn('[HeyAlls] Honeypot triggered — submission dropped')
+      return
+    }
+
+    const next = validateAll()
+    setErrors(next)
+    // Bail if any errors
+    if (Object.keys(next).length > 0) {
+      // Focus the first errored field for accessibility
+      const firstErrorField =
+        next.name    ? 'user_name'
+      : next.email   ? 'user_email'
+      : next.message ? 'message'
+      :                null
+      if (firstErrorField) {
+        const el = formRef.current?.querySelector<HTMLInputElement>(`[name="${firstErrorField}"]`)
+        el?.focus()
+      }
+      return
+    }
+
+    setIsSending(true)
     emailjs
       .sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, formRef.current!, EMAILJS_PUBLIC_KEY)
       .then(() => {
         setIsSending(false)
         if (formRef.current) formRef.current.reset()
         setSelectedService(null)
-        // FIX: Toast replaces the inline success message — far more visible
+        setErrors({})
         showToast('Talebiniz başarıyla alındı. En kısa sürede dönüş yapılacaktır.', 'success')
       })
       .catch((err: unknown) => {
@@ -73,14 +164,20 @@ export default function Home() {
       })
   }
 
+  // ── Reusable input wrapper showing inline errors ─────────────────────────
+  const fieldClassName = (hasError: boolean) =>
+    `w-full bg-transparent border-b pb-2 text-white focus:outline-none transition-colors ${
+      hasError
+        ? 'border-red-400/60 focus:border-red-400'
+        : 'border-white/20 focus:border-white'
+    }`
+
   return (
     <div className="relative min-h-screen w-full bg-[#001a2c] text-white selection:bg-white/20">
       <VideoBackground overlayOpacity="light" />
       <WebGLLayer />
       <Navbar activePage="home" />
       <StickyMobileCTA />
-
-      {/* Toast notifications — renders at top of screen */}
       <ToastContainer toasts={toasts} onRemove={removeToast} />
 
       {/* Hero */}
@@ -160,7 +257,7 @@ export default function Home() {
               </div>
             </Link>
 
-            {/* Orimo Auto — now links to case study */}
+            {/* Orimo Auto */}
             <Link
               to="/calismalarimiz/orimo"
               onMouseMove={(e) => handleMouseMove(e, 'orimo')}
@@ -177,7 +274,7 @@ export default function Home() {
               </div>
             </Link>
 
-            {/* Carreas — now links to case study */}
+            {/* Carreas */}
             <Link
               to="/calismalarimiz/carreas"
               onMouseMove={(e) => handleMouseMove(e, 'carreas')}
@@ -193,17 +290,17 @@ export default function Home() {
             </Link>
 
             {/* Patron Tour */}
-     <Link
-  to="/calismalarimiz/patron-tour"
-  className="group relative col-span-1 md:col-span-1 md:row-span-1 rounded-3xl overflow-hidden bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all duration-700 flex flex-col justify-center items-center text-center p-6 min-h-[250px] shadow-xl hover:shadow-2xl"
->
-  <div className="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors duration-500" />
-  <div className="relative z-20">
-    <span className="text-[10px] text-white/50 uppercase tracking-widest mb-2 block">Performans Pazarlama</span>
-    <h3 className="text-2xl text-white mb-3" style={displayFont}>Patron Tour</h3>
-    <p className="text-white/40 text-xs leading-relaxed">Etkileşim odaklı sosyal medya yönetimi ve agresif Meta reklam operasyonları.</p>
-  </div>
-</Link>
+            <Link
+              to="/calismalarimiz/patron-tour"
+              className="group relative col-span-1 md:col-span-1 md:row-span-1 rounded-3xl overflow-hidden bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all duration-700 flex flex-col justify-center items-center text-center p-6 min-h-[250px] shadow-xl hover:shadow-2xl"
+            >
+              <div className="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors duration-500" />
+              <div className="relative z-20">
+                <span className="text-[10px] text-white/50 uppercase tracking-widest mb-2 block">Performans Pazarlama</span>
+                <h3 className="text-2xl text-white mb-3" style={displayFont}>Patron Tour</h3>
+                <p className="text-white/40 text-xs leading-relaxed">Etkileşim odaklı sosyal medya yönetimi ve agresif Meta reklam operasyonları.</p>
+              </div>
+            </Link>
           </div>
         </div>
       </section>
@@ -231,12 +328,36 @@ export default function Home() {
             </p>
           </div>
 
-          <form ref={formRef} onSubmit={sendEmail} className="space-y-8">
+          <form ref={formRef} onSubmit={sendEmail} noValidate className="space-y-8">
             <input
               type="hidden"
               name="selected_service"
               value={services.find((s) => s.id === selectedService)?.label ?? 'Belirtilmedi'}
             />
+
+            {/* Honeypot — invisible to humans, bots fill it. Real submission bails if not empty. */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                left: '-9999px',
+                width: '1px',
+                height: '1px',
+                opacity: 0,
+                pointerEvents: 'none',
+              }}
+            >
+              <label htmlFor="website_url">Website (boş bırakın)</label>
+              <input
+                id="website_url"
+                type="text"
+                name="website_url"
+                tabIndex={-1}
+                autoComplete="off"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+              />
+            </div>
 
             <div className="space-y-4">
               <label className="text-xs uppercase tracking-widest text-white/70">
@@ -247,7 +368,10 @@ export default function Home() {
                   <button
                     key={service.id}
                     type="button"
-                    onClick={() => { setSelectedService(service.id); setServiceError(false) }}
+                    onClick={() => {
+                      setSelectedService(service.id)
+                      setErrors((prev) => ({ ...prev, service: undefined }))
+                    }}
                     className={`px-5 py-3 rounded-full text-sm transition-all duration-300 border text-left md:text-center ${
                       selectedService === service.id
                         ? 'bg-white text-black border-white shadow-lg scale-[1.01]'
@@ -258,8 +382,8 @@ export default function Home() {
                   </button>
                 ))}
               </div>
-              {serviceError && (
-                <p className="text-red-400 text-xs mt-1 animate-pulse">Lütfen bir hizmet türü seçin.</p>
+              {errors.service && (
+                <p role="alert" className="text-red-400 text-xs mt-1">{errors.service}</p>
               )}
             </div>
 
@@ -272,10 +396,15 @@ export default function Home() {
                   id="user_name"
                   type="text"
                   name="user_name"
-                  required
-                  className="w-full bg-transparent border-b border-white/20 pb-2 text-white focus:outline-none focus:border-white transition-colors"
+                  onChange={handleFieldChange}
+                  aria-invalid={!!errors.name}
+                  aria-describedby={errors.name ? 'user_name-error' : undefined}
+                  className={fieldClassName(!!errors.name)}
                   placeholder="Kişi veya kurum adınız"
                 />
+                {errors.name && (
+                  <p id="user_name-error" role="alert" className="text-red-400 text-xs">{errors.name}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <label htmlFor="user_email" className="text-xs uppercase tracking-widest text-white/70 cursor-pointer">
@@ -285,10 +414,15 @@ export default function Home() {
                   id="user_email"
                   type="email"
                   name="user_email"
-                  required
-                  className="w-full bg-transparent border-b border-white/20 pb-2 text-white focus:outline-none focus:border-white transition-colors"
-                  placeholder="Size nasıl ulaşabiliriz?"
+                  onChange={handleFieldChange}
+                  aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? 'user_email-error' : undefined}
+                  className={fieldClassName(!!errors.email)}
+                  placeholder="ornek@firma.com"
                 />
+                {errors.email && (
+                  <p id="user_email-error" role="alert" className="text-red-400 text-xs">{errors.email}</p>
+                )}
               </div>
             </div>
 
@@ -299,11 +433,16 @@ export default function Home() {
               <textarea
                 id="message"
                 name="message"
-                required
+                onChange={handleFieldChange}
                 rows={3}
-                className="w-full bg-transparent border-b border-white/20 pb-2 text-white focus:outline-none focus:border-white transition-colors resize-none"
+                aria-invalid={!!errors.message}
+                aria-describedby={errors.message ? 'message-error' : undefined}
+                className={`${fieldClassName(!!errors.message)} resize-none`}
                 placeholder="Lütfen detayları bizimle paylaşın..."
               />
+              {errors.message && (
+                <p id="message-error" role="alert" className="text-red-400 text-xs">{errors.message}</p>
+              )}
             </div>
 
             <div className="pt-8 text-center">
