@@ -7,33 +7,37 @@ interface NavbarProps {
 }
 
 const navLinks = [
-  { name: 'Ana Sayfa', to: '/', id: 'home' },
-  { name: 'Sürecimiz', to: '/surecimiz', id: 'process' },
-  { name: 'Hizmetlerimiz', to: '/hizmetlerimiz', id: 'services' },
-  { name: 'Çalışmalarımız', to: '/calismalarimiz', id: 'portfolio' },
+  { name: 'Ana Sayfa',       to: '/',                id: 'home' },
+  { name: 'Sürecimiz',       to: '/surecimiz',       id: 'process' },
+  { name: 'Hizmetlerimiz',   to: '/hizmetlerimiz',   id: 'services' },
+  { name: 'Çalışmalarımız',  to: '/calismalarimiz',  id: 'portfolio' },
 ]
+
+// Subtle layered shadow so menu text reads against any video frame
+// without needing a background. Outer soft blur + inner contact shadow.
+const textShadowStyle = {
+  textShadow: '0 1px 8px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.45)',
+}
 
 export default function Navbar({ activePage }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false)
   const location = useLocation()
 
-  // ── Animated indicator state ──────────────────────────────────────────────
+  // Animated indicator
   const navRef = useRef<HTMLElement>(null)
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, opacity: 0 })
   const activeRef = useRef<HTMLAnchorElement | null>(null)
 
-  // Determine active link from URL (works even on sub-pages like /calismalarimiz/bimeeting)
   const activeId = navLinks.find(link =>
     link.to === '/'
       ? location.pathname === '/'
       : location.pathname.startsWith(link.to)
   )?.id ?? activePage
 
-  // Measure and position the indicator under the active link
   useEffect(() => {
     const updateIndicator = () => {
       if (!activeRef.current || !navRef.current) return
-      const navRect = navRef.current.getBoundingClientRect()
+      const navRect  = navRef.current.getBoundingClientRect()
       const linkRect = activeRef.current.getBoundingClientRect()
       setIndicatorStyle({
         left: linkRect.left - navRect.left,
@@ -53,15 +57,20 @@ export default function Navbar({ activePage }: NavbarProps) {
   }, [isOpen])
 
   return (
-    <header className="fixed top-0 left-0 z-[9999] w-full bg-[#001a2c]/90 backdrop-blur-lg border-b border-white/5 transition-all duration-300">
+    // Borderless: bg-transparent + the lightest possible backdrop-blur for
+    // protection against bright video frames. No bg color, no border-bottom.
+    <header className="fixed top-0 left-0 z-[9999] w-full bg-transparent backdrop-blur-sm">
       <div className="px-6 md:px-8 py-4 max-w-7xl mx-auto flex flex-row justify-between items-center relative z-[110]">
-        <Link to="/" className="text-2xl font-medium text-white flex items-center gap-1" style={displayFont}>
+        <Link
+          to="/"
+          className="text-2xl font-medium text-white flex items-center gap-1"
+          style={{ ...displayFont, ...textShadowStyle }}
+        >
           HeyAlls
         </Link>
 
         {/* Desktop nav with sliding indicator */}
         <nav ref={navRef} className="hidden md:flex flex-row gap-8 items-center relative">
-          {/* Sliding underline indicator */}
           <span
             className="absolute bottom-[-6px] h-[1.5px] bg-white rounded-full transition-all duration-300 ease-out"
             style={{
@@ -79,8 +88,9 @@ export default function Navbar({ activePage }: NavbarProps) {
                 to={link.to}
                 ref={isActive ? (el) => { activeRef.current = el } : null}
                 className={`text-sm tracking-wide transition-colors duration-300 pb-1 ${
-                  isActive ? 'text-white' : 'text-white/50 hover:text-white'
+                  isActive ? 'text-white' : 'text-white/80 hover:text-white'
                 }`}
+                style={textShadowStyle}
               >
                 {link.name}
               </Link>
@@ -89,7 +99,8 @@ export default function Navbar({ activePage }: NavbarProps) {
 
           <a
             href="/#intake"
-            className="bg-white/10 backdrop-blur-md border border-white/20 text-white px-6 py-2 rounded-full text-sm font-medium transition-all hover:bg-white hover:text-black"
+            className="bg-white/10 backdrop-blur-md border border-white/25 text-white px-6 py-2 rounded-full text-sm font-medium transition-all hover:bg-white hover:text-black"
+            style={textShadowStyle}
           >
             Projeyi Başlat
           </a>
@@ -109,7 +120,7 @@ export default function Navbar({ activePage }: NavbarProps) {
         </button>
       </div>
 
-      {/* Mobile full-screen menu */}
+      {/* Mobile full-screen menu — keeps solid bg because mobile text needs hyper-readability */}
       <div
         id="mobile-menu"
         role="dialog"

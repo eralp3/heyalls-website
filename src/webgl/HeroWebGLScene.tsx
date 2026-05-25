@@ -1,66 +1,33 @@
 import { useEffect, useRef } from 'react'
 
 /**
- * HeroWebGLScene — Seasonal Refraction with Scroll-Reactive Physics
+ * HeroWebGLScene — Microscopic Refraction (Whisper Edition)
  * ────────────────────────────────────────────────────────────────────────────
- * Upgrades over v17:
- *   • Scroll-velocity tracking → dynamic distortion amplification
- *   • Chromatic aberration (RGB split) tied to velocity
- *   • Per-season specular intensity (icy winter, matte summer)
- *
- * Existing systems preserved unchanged:
- *   • 4-season color/speed/amp/scale interpolation via ScrollTrigger
- *   • Move + click ripple ring buffer
- *   • IntersectionObserver pause
- *   • Content-readability opacity dip mid-scroll
+ * The surface is now an absolute whisper. The video reads almost untouched.
+ * Effect only becomes visible under interaction: cursor ripples, click splash,
+ * scroll velocity.
  */
 
-// ─── SEASON STATES ──────────────────────────────────────────────────────────
 interface SeasonState {
   color:      { r: number; g: number; b: number }
   noiseSpeed: number
   noiseAmp:   number
   noiseScale: number
-  specular:   number   // NEW: per-season surface glossiness
+  specular:   number
 }
 
 const SEASONS: SeasonState[] = [
-  // 0. Summer — calm, deep teal-navy, soft matte surface
-  {
-    color:      { r: 0.02, g: 0.14, b: 0.20 },
-    noiseSpeed: 0.10,
-    noiseAmp:   0.008,
-    noiseScale: 6.5,
-    specular:   0.05,
-  },
-  // 1. Autumn — turbulent muted bronze, medium gloss
-  {
-    color:      { r: 0.18, g: 0.11, b: 0.08 },
-    noiseSpeed: 0.35,
-    noiseAmp:   0.014,
-    noiseScale: 5.0,
-    specular:   0.08,
-  },
-  // 2. Winter — frozen icy cyan, HIGH gloss (ice surface)
-  {
-    color:      { r: 0.08, g: 0.18, b: 0.26 },
-    noiseSpeed: 0.01,
-    noiseAmp:   0.005,
-    noiseScale: 9.0,
-    specular:   0.15,
-  },
-  // 3. Spring — alive sage-blue, soft gloss
-  {
-    color:      { r: 0.05, g: 0.20, b: 0.18 },
-    noiseSpeed: 0.20,
-    noiseAmp:   0.010,
-    noiseScale: 5.8,
-    specular:   0.07,
-  },
+  // 0. Summer — ultra-calm, near-invisible
+  { color: { r: 0.02, g: 0.14, b: 0.20 }, noiseSpeed: 0.08, noiseAmp: 0.0005, noiseScale: 3.5, specular: 0.01 },
+  // 1. Autumn — slightly more presence (mid-page accent)
+  { color: { r: 0.18, g: 0.11, b: 0.08 }, noiseSpeed: 0.25, noiseAmp: 0.0015, noiseScale: 2.8, specular: 0.02 },
+  // 2. Winter — frozen still, but retained gloss for ice highlights
+  { color: { r: 0.08, g: 0.18, b: 0.26 }, noiseSpeed: 0.01, noiseAmp: 0.0002, noiseScale: 5.0, specular: 0.05 },
+  // 3. Spring — gentle micro motion
+  { color: { r: 0.05, g: 0.20, b: 0.18 }, noiseSpeed: 0.15, noiseAmp: 0.0008, noiseScale: 3.0, specular: 0.01 },
 ]
 
-// ─── INTERACTION TUNING (unchanged) ─────────────────────────────────────────
-const TINT_STRENGTH      = 0.45
+const TINT_STRENGTH      = 0.05   // ↓ from 0.20 — video shines through almost untouched
 const RIPPLE_MOVE_AMP    = 0.010
 const RIPPLE_CLICK_AMP   = 0.025
 const RIPPLE_RING_WIDTH  = 0.08
@@ -68,15 +35,13 @@ const RIPPLE_SPEED       = 1.6
 const RIPPLE_LIFE        = 1.8
 const RIPPLE_SPAWN_DIST  = 0.03
 
-// ─── SCROLL VELOCITY TUNING ─────────────────────────────────────────────────
-// GSAP's getVelocity() returns px/sec. We normalize and damp it.
-const VELOCITY_NORMALIZE  = 3000   // px/sec at which velocity reaches ~1.0
-const VELOCITY_MAX        = 1.5    // hard cap on the normalized value
-const VELOCITY_DAMP       = 6.0    // lerp factor — higher = snappier decay
+const VELOCITY_NORMALIZE = 3000
+const VELOCITY_MAX       = 1.5
+const VELOCITY_DAMP      = 6.0
+const VELOCITY_MULT      = 1.2
 
-// ─── RGB SPLIT TUNING ───────────────────────────────────────────────────────
-const RGB_SHIFT_BASE      = 0.002  // baseline aberration (idle)
-const RGB_SHIFT_VELOCITY  = 20.0   // multiplier on velocity (matches brief)
+const RGB_SHIFT_BASE     = 0.0005 // ↓ from 0.001 — even quieter baseline aberration
+const RGB_SHIFT_VELOCITY = 20.0
 
 const MAX_RIPPLES = 5
 
@@ -96,7 +61,6 @@ export default function HeroWebGLScene() {
       if (cancelled || !containerRef.current) return
       const container = containerRef.current
 
-      // ── DOM contract ────────────────────────────────────────────────────
       const videoEl = document.getElementById('bg-video') as HTMLVideoElement | null
       if (!videoEl) {
         console.warn('[HeroWebGLScene] No <video id="bg-video"> in DOM — refraction disabled')
@@ -106,7 +70,6 @@ export default function HeroWebGLScene() {
       videoEl.playsInline = true
       videoEl.play().catch(() => { /* autoplay policy — silent */ })
 
-      // ── Renderer ────────────────────────────────────────────────────────
       const renderer = new THREE.WebGLRenderer({
         alpha: true,
         antialias: false,
@@ -117,17 +80,14 @@ export default function HeroWebGLScene() {
       renderer.setClearColor(0x000000, 0)
       container.appendChild(renderer.domElement)
 
-      // ── Scene + Camera ──────────────────────────────────────────────────
       const scene = new THREE.Scene()
       const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -1, 1)
 
-      // ── Video texture ───────────────────────────────────────────────────
       const videoTexture = new THREE.VideoTexture(videoEl)
       videoTexture.minFilter = THREE.LinearFilter
       videoTexture.magFilter = THREE.LinearFilter
       ;(videoTexture as unknown as { colorSpace?: string }).colorSpace = THREE.SRGBColorSpace
 
-      // ── Ripple ring buffer (unchanged) ──────────────────────────────────
       const ripplePositions  = new Float32Array(MAX_RIPPLES * 2)
       const rippleAges       = new Float32Array(MAX_RIPPLES)
       const rippleActive     = new Int32Array(MAX_RIPPLES)
@@ -154,7 +114,6 @@ export default function HeroWebGLScene() {
           uRippleRingWidth:  { value: RIPPLE_RING_WIDTH },
           uSpecular:         { value: initial.specular },
           uOpacity:          { value: 1.0 },
-          // ── NEW uniforms ────────────────────────────────────────────────
           uScrollVelocity:   { value: 0.0 },
           uRGBShift:         { value: RGB_SHIFT_BASE },
         },
@@ -190,7 +149,6 @@ export default function HeroWebGLScene() {
 
           varying vec2 vUv;
 
-          // ── 2D Simplex noise (Ashima Arts / Stefan Gustavson, BSD) ──────
           vec3 mod289(vec3 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
           vec2 mod289(vec2 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
           vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
@@ -226,7 +184,6 @@ export default function HeroWebGLScene() {
             vec2 uv = vUv;
             float aspect = uResolution.x / uResolution.y;
 
-            // ── Ambient noise displacement ──────────────────────────────────
             vec2 noiseUV = uv * uNoiseScale;
             noiseUV.x *= aspect;
             float t = uTime * uNoiseSpeed;
@@ -234,7 +191,6 @@ export default function HeroWebGLScene() {
             float n2 = fbm(noiseUV + vec2(0.0, t * 0.7) + 100.0);
             vec2 noiseDisp = vec2(n1, n2) * uNoiseAmp;
 
-            // ── Ripple displacement ────────────────────────────────────────
             vec2 rippleDisp = vec2(0.0);
             for (int i = 0; i < ${MAX_RIPPLES}; i++) {
               if (uRippleActive[i] == 1) {
@@ -247,26 +203,19 @@ export default function HeroWebGLScene() {
                 float t01  = age / uRippleLife;
                 float ringPos = age * uRippleSpeed;
                 float ringStrength = exp(-pow((dist - ringPos) / uRippleRingWidth, 2.0));
-                float fade = pow(1.0 - t01, 2.0);
+                float fade = pow(1.0 - t01, 3.0);
 
                 vec2 dir = (dist > 0.0001) ? toCenter / dist : vec2(0.0);
                 rippleDisp += dir * ringStrength * fade * uRippleAmplitudes[i];
               }
             }
 
-            // ── Combine noise + ripples, then amplify by scroll velocity ────
-            // We use abs() so direction stays consistent regardless of scroll
-            // direction. Base multiplier is 1.0 so the ambient ocean never
-            // freezes when the user is idle.
             float velMag = abs(uScrollVelocity);
-            vec2 totalDisp = (noiseDisp + rippleDisp) * (1.0 + velMag * 3.5);
+            vec2 totalDisp = (noiseDisp + rippleDisp) * (1.0 + velMag * ${VELOCITY_MULT.toFixed(2)});
 
             vec2 sampleUV = clamp(uv + totalDisp, 0.001, 0.999);
 
-            // ── Chromatic aberration (RGB split) ────────────────────────────
-            // The shift grows with velocity for that "fast scroll" smear feel.
             float shift = uRGBShift * (1.0 + velMag * ${RGB_SHIFT_VELOCITY.toFixed(1)});
-
             vec2 uvR = clamp(sampleUV + totalDisp * shift, 0.001, 0.999);
             vec2 uvG = sampleUV;
             vec2 uvB = clamp(sampleUV - totalDisp * shift, 0.001, 0.999);
@@ -277,10 +226,8 @@ export default function HeroWebGLScene() {
               texture2D(uVideo, uvB).b
             );
 
-            // ── Tint mix ────────────────────────────────────────────────────
             vec3 col = mix(videoColor, uTintColor, uTintStrength);
 
-            // ── Per-season specular highlight on noise crests ──────────────
             float crest = smoothstep(0.4, 0.9, n1);
             col += vec3(crest * uSpecular);
 
@@ -296,7 +243,6 @@ export default function HeroWebGLScene() {
       const quad = new THREE.Mesh(geometry, material)
       scene.add(quad)
 
-      // ── Ripple spawning (unchanged) ─────────────────────────────────────
       const spawnRipple = (uvX: number, uvY: number, amplitude: number) => {
         let slot = -1
         let oldestAge = -1
@@ -336,7 +282,6 @@ export default function HeroWebGLScene() {
       }
       document.addEventListener('pointerdown', handlePointerDown, { passive: true })
 
-      // ── Viewport observer ───────────────────────────────────────────────
       let inViewport = true
       const observer = new IntersectionObserver(
         ([entry]) => { inViewport = entry.isIntersecting },
@@ -344,7 +289,6 @@ export default function HeroWebGLScene() {
       )
       observer.observe(container)
 
-      // ── Seasonal ScrollTrigger ──────────────────────────────────────────
       const tmpColorA = new THREE.Color()
       const tmpColorB = new THREE.Color()
       const tmpColorOut = new THREE.Color()
@@ -368,31 +312,29 @@ export default function HeroWebGLScene() {
         material.uniforms.uNoiseSpeed.value = THREE.MathUtils.lerp(A.noiseSpeed, B.noiseSpeed, segT)
         material.uniforms.uNoiseAmp.value   = THREE.MathUtils.lerp(A.noiseAmp,   B.noiseAmp,   segT)
         material.uniforms.uNoiseScale.value = THREE.MathUtils.lerp(A.noiseScale, B.noiseScale, segT)
-        // NEW: specular interpolation
         material.uniforms.uSpecular.value   = THREE.MathUtils.lerp(A.specular,   B.specular,   segT)
 
-        // Content readability dip (unchanged from v17)
         const dip = 1 - Math.sin(progress * Math.PI) * 0.15
         material.uniforms.uOpacity.value = dip
       }
 
       applySeasonAt(0)
 
+      let velocityTarget = 0
+
       const seasonScrollTrigger = ScrollTrigger.create({
         trigger: document.body,
         start: 'top top',
         end: 'bottom bottom',
         scrub: 0.5,
-        onUpdate: (self) => applySeasonAt(self.progress),
+        onUpdate: (self) => {
+          applySeasonAt(self.progress)
+          const raw = self.getVelocity() / VELOCITY_NORMALIZE
+          velocityTarget = Math.max(-VELOCITY_MAX, Math.min(VELOCITY_MAX, raw))
+        },
       })
 
-      // ── Scroll velocity tracking ────────────────────────────────────────
-      // GSAP gives us the raw px/sec. We normalize, clamp, then lerp toward
-      // the target each frame so the velocity ramps up fast and decays
-      // smoothly to zero when scrolling stops.
       let currentVelocity = 0
-
-      // ── Render loop ─────────────────────────────────────────────────────
       let lastTime = performance.now()
       let rafId = 0
 
@@ -407,17 +349,11 @@ export default function HeroWebGLScene() {
         const dt = Math.min((now - lastTime) / 1000, 0.05)
         lastTime = now
 
-        // ── Velocity update (per frame) ──────────────────────────────────
-        // ScrollTrigger.getVelocity() returns signed px/sec.
-        // Normalize → clamp → exponential-style lerp toward target.
-        const rawVel = (ScrollTrigger as unknown as { getVelocity: () => number }).getVelocity() / VELOCITY_NORMALIZE
-        const clamped = Math.max(-VELOCITY_MAX, Math.min(VELOCITY_MAX, rawVel))
-        // Lerp factor scales with dt for framerate independence
+        velocityTarget *= Math.exp(-VELOCITY_DAMP * dt * 0.5)
         const k = 1 - Math.exp(-VELOCITY_DAMP * dt)
-        currentVelocity += (clamped - currentVelocity) * k
+        currentVelocity += (velocityTarget - currentVelocity) * k
         material.uniforms.uScrollVelocity.value = currentVelocity
 
-        // Ripple aging
         for (let i = 0; i < MAX_RIPPLES; i++) {
           if (rippleActive[i] === 1) {
             rippleAges[i] += dt
@@ -432,7 +368,6 @@ export default function HeroWebGLScene() {
       }
       animate()
 
-      // ── Resize ──────────────────────────────────────────────────────────
       const handleResize = () => {
         const w = window.innerWidth
         const h = window.innerHeight
@@ -442,7 +377,6 @@ export default function HeroWebGLScene() {
       }
       window.addEventListener('resize', handleResize)
 
-      // ── Cleanup ─────────────────────────────────────────────────────────
       cleanupRef.current = () => {
         cancelAnimationFrame(rafId)
         document.removeEventListener('pointermove', handlePointerMove)
